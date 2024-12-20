@@ -1,0 +1,746 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C00949F32D0BA5C500041A1F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = C00949F22D0BA5C500041A1F /* FirebaseAnalytics */; };
+		C00949F52D0BA5C500041A1F /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = C00949F42D0BA5C500041A1F /* FirebaseAnalyticsOnDeviceConversion */; };
+		C00949F72D0BA5C500041A1F /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = C00949F62D0BA5C500041A1F /* FirebaseAnalyticsWithoutAdIdSupport */; };
+		C00949F92D0BA5C500041A1F /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = C00949F82D0BA5C500041A1F /* FirebaseAppCheck */; };
+		C00949FB2D0BA5C500041A1F /* FirebaseAppDistribution-Beta in Frameworks */ = {isa = PBXBuildFile; productRef = C00949FA2D0BA5C500041A1F /* FirebaseAppDistribution-Beta */; };
+		C00949FE2D0BA64900041A1F /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = C00949FD2D0BA64900041A1F /* KeychainAccess */; };
+		C041203B2D11DDC8006292CF /* MessageKit in Frameworks */ = {isa = PBXBuildFile; productRef = C041203A2D11DDC8006292CF /* MessageKit */; };
+		C041203E2D11E045006292CF /* InputBarAccessoryView in Frameworks */ = {isa = PBXBuildFile; productRef = C041203D2D11E045006292CF /* InputBarAccessoryView */; };
+		C04120402D11E0D3006292CF /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C041203F2D11E0D3006292CF /* Storyboard.storyboard */; };
+		C04D47752D0C9BEE00C32737 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = C04D47742D0C9BEE00C32737 /* FirebaseAuth */; };
+		C04D47772D0C9BF700C32737 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = C04D47762D0C9BF700C32737 /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C04844EE2D0392E200034F07 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C04844D52D0392E100034F07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C04844DC2D0392E100034F07;
+			remoteInfo = "Bedford Autobody";
+		};
+		C04844F82D0392E200034F07 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C04844D52D0392E100034F07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C04844DC2D0392E100034F07;
+			remoteInfo = "Bedford Autobody";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		C041203F2D11E0D3006292CF /* Storyboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
+		C04844DD2D0392E100034F07 /* Bedford Autobody.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bedford Autobody.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C04844ED2D0392E200034F07 /* Bedford AutobodyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Bedford AutobodyTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C04844F72D0392E200034F07 /* Bedford AutobodyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Bedford AutobodyUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		C04844DF2D0392E100034F07 /* Bedford Autobody */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Bedford Autobody";
+			sourceTree = "<group>";
+		};
+		C04844F02D0392E200034F07 /* Bedford AutobodyTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Bedford AutobodyTests";
+			sourceTree = "<group>";
+		};
+		C04844FA2D0392E200034F07 /* Bedford AutobodyUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Bedford AutobodyUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C04844DA2D0392E100034F07 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C00949F92D0BA5C500041A1F /* FirebaseAppCheck in Frameworks */,
+				C041203E2D11E045006292CF /* InputBarAccessoryView in Frameworks */,
+				C00949F32D0BA5C500041A1F /* FirebaseAnalytics in Frameworks */,
+				C00949FE2D0BA64900041A1F /* KeychainAccess in Frameworks */,
+				C041203B2D11DDC8006292CF /* MessageKit in Frameworks */,
+				C00949FB2D0BA5C500041A1F /* FirebaseAppDistribution-Beta in Frameworks */,
+				C00949F72D0BA5C500041A1F /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
+				C04D47772D0C9BF700C32737 /* FirebaseFirestore in Frameworks */,
+				C04D47752D0C9BEE00C32737 /* FirebaseAuth in Frameworks */,
+				C00949F52D0BA5C500041A1F /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C04844EA2D0392E200034F07 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C04844F42D0392E200034F07 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C04844D42D0392E100034F07 = {
+			isa = PBXGroup;
+			children = (
+				C041203F2D11E0D3006292CF /* Storyboard.storyboard */,
+				C04844DF2D0392E100034F07 /* Bedford Autobody */,
+				C04844F02D0392E200034F07 /* Bedford AutobodyTests */,
+				C04844FA2D0392E200034F07 /* Bedford AutobodyUITests */,
+				C04D47732D0C9BEE00C32737 /* Frameworks */,
+				C04844DE2D0392E100034F07 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C04844DE2D0392E100034F07 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C04844DD2D0392E100034F07 /* Bedford Autobody.app */,
+				C04844ED2D0392E200034F07 /* Bedford AutobodyTests.xctest */,
+				C04844F72D0392E200034F07 /* Bedford AutobodyUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C04D47732D0C9BEE00C32737 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C04844DC2D0392E100034F07 /* Bedford Autobody */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C04845012D0392E200034F07 /* Build configuration list for PBXNativeTarget "Bedford Autobody" */;
+			buildPhases = (
+				C04844D92D0392E100034F07 /* Sources */,
+				C04844DA2D0392E100034F07 /* Frameworks */,
+				C04844DB2D0392E100034F07 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				C04844DF2D0392E100034F07 /* Bedford Autobody */,
+			);
+			name = "Bedford Autobody";
+			productName = "Bedford Autobody";
+			productReference = C04844DD2D0392E100034F07 /* Bedford Autobody.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C04844EC2D0392E200034F07 /* Bedford AutobodyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C04845042D0392E200034F07 /* Build configuration list for PBXNativeTarget "Bedford AutobodyTests" */;
+			buildPhases = (
+				87A6BB23ED84B8A06F522A84 /* [CP] Check Pods Manifest.lock */,
+				C04844E92D0392E200034F07 /* Sources */,
+				C04844EA2D0392E200034F07 /* Frameworks */,
+				C04844EB2D0392E200034F07 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C04844EF2D0392E200034F07 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C04844F02D0392E200034F07 /* Bedford AutobodyTests */,
+			);
+			name = "Bedford AutobodyTests";
+			productName = "Bedford AutobodyTests";
+			productReference = C04844ED2D0392E200034F07 /* Bedford AutobodyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		C04844F62D0392E200034F07 /* Bedford AutobodyUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C04845072D0392E200034F07 /* Build configuration list for PBXNativeTarget "Bedford AutobodyUITests" */;
+			buildPhases = (
+				4DE7D379014BC5A1A30BEB36 /* [CP] Check Pods Manifest.lock */,
+				C04844F32D0392E200034F07 /* Sources */,
+				C04844F42D0392E200034F07 /* Frameworks */,
+				C04844F52D0392E200034F07 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C04844F92D0392E200034F07 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				C04844FA2D0392E200034F07 /* Bedford AutobodyUITests */,
+			);
+			name = "Bedford AutobodyUITests";
+			productName = "Bedford AutobodyUITests";
+			productReference = C04844F72D0392E200034F07 /* Bedford AutobodyUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C04844D52D0392E100034F07 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1610;
+				LastUpgradeCheck = 1610;
+				TargetAttributes = {
+					C04844DC2D0392E100034F07 = {
+						CreatedOnToolsVersion = 16.1;
+					};
+					C04844EC2D0392E200034F07 = {
+						CreatedOnToolsVersion = 16.1;
+						TestTargetID = C04844DC2D0392E100034F07;
+					};
+					C04844F62D0392E200034F07 = {
+						CreatedOnToolsVersion = 16.1;
+						TestTargetID = C04844DC2D0392E100034F07;
+					};
+				};
+			};
+			buildConfigurationList = C04844D82D0392E100034F07 /* Build configuration list for PBXProject "Bedford Autobody" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C04844D42D0392E100034F07;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				C0BAC2362D0791ED0021BC8C /* XCRemoteSwiftPackageReference "swift-crypto" */,
+				C00949F12D0BA5C500041A1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				C00949FC2D0BA64900041A1F /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				C04120392D11DDBF006292CF /* XCRemoteSwiftPackageReference "MessageKit" */,
+				C041203C2D11E03B006292CF /* XCRemoteSwiftPackageReference "InputBarAccessoryView" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = C04844DE2D0392E100034F07 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C04844DC2D0392E100034F07 /* Bedford Autobody */,
+				C04844EC2D0392E200034F07 /* Bedford AutobodyTests */,
+				C04844F62D0392E200034F07 /* Bedford AutobodyUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C04844DB2D0392E100034F07 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C04120402D11E0D3006292CF /* Storyboard.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C04844EB2D0392E200034F07 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C04844F52D0392E200034F07 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4DE7D379014BC5A1A30BEB36 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Bedford AutobodyUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		87A6BB23ED84B8A06F522A84 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Bedford AutobodyTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C04844D92D0392E100034F07 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C04844E92D0392E200034F07 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C04844F32D0392E200034F07 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C04844EF2D0392E200034F07 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C04844DC2D0392E100034F07 /* Bedford Autobody */;
+			targetProxy = C04844EE2D0392E200034F07 /* PBXContainerItemProxy */;
+		};
+		C04844F92D0392E200034F07 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C04844DC2D0392E100034F07 /* Bedford Autobody */;
+			targetProxy = C04844F82D0392E200034F07 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		C04844FF2D0392E200034F07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		C04845002D0392E200034F07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C04845022D0392E200034F07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Bedford Autobody/Bedford Autobody.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Bedford Autobody/Preview Content\"";
+				DEVELOPMENT_TEAM = YJZG87QGT5;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "APP.Bedford-Autobody";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C04845032D0392E200034F07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "Bedford Autobody/Bedford Autobody.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Bedford Autobody/Preview Content\"";
+				DEVELOPMENT_TEAM = YJZG87QGT5;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "APP.Bedford-Autobody";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C04845052D0392E200034F07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YJZG87QGT5;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "APP.Bedford-AutobodyTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bedford Autobody.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Bedford Autobody";
+			};
+			name = Debug;
+		};
+		C04845062D0392E200034F07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YJZG87QGT5;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "APP.Bedford-AutobodyTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Bedford Autobody.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Bedford Autobody";
+			};
+			name = Release;
+		};
+		C04845082D0392E200034F07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YJZG87QGT5;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "APP.Bedford-AutobodyUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Bedford Autobody";
+			};
+			name = Debug;
+		};
+		C04845092D0392E200034F07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YJZG87QGT5;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "APP.Bedford-AutobodyUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Bedford Autobody";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C04844D82D0392E100034F07 /* Build configuration list for PBXProject "Bedford Autobody" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C04844FF2D0392E200034F07 /* Debug */,
+				C04845002D0392E200034F07 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C04845012D0392E200034F07 /* Build configuration list for PBXNativeTarget "Bedford Autobody" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C04845022D0392E200034F07 /* Debug */,
+				C04845032D0392E200034F07 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C04845042D0392E200034F07 /* Build configuration list for PBXNativeTarget "Bedford AutobodyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C04845052D0392E200034F07 /* Debug */,
+				C04845062D0392E200034F07 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C04845072D0392E200034F07 /* Build configuration list for PBXNativeTarget "Bedford AutobodyUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C04845082D0392E200034F07 /* Debug */,
+				C04845092D0392E200034F07 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C00949F12D0BA5C500041A1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.6.0;
+			};
+		};
+		C00949FC2D0BA64900041A1F /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		C04120392D11DDBF006292CF /* XCRemoteSwiftPackageReference "MessageKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MessageKit/MessageKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		C041203C2D11E03B006292CF /* XCRemoteSwiftPackageReference "InputBarAccessoryView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nathantannar4/InputBarAccessoryView.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
+		C0BAC2362D0791ED0021BC8C /* XCRemoteSwiftPackageReference "swift-crypto" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-crypto.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.10.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C00949F22D0BA5C500041A1F /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C00949F12D0BA5C500041A1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		C00949F42D0BA5C500041A1F /* FirebaseAnalyticsOnDeviceConversion */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C00949F12D0BA5C500041A1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsOnDeviceConversion;
+		};
+		C00949F62D0BA5C500041A1F /* FirebaseAnalyticsWithoutAdIdSupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C00949F12D0BA5C500041A1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsWithoutAdIdSupport;
+		};
+		C00949F82D0BA5C500041A1F /* FirebaseAppCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C00949F12D0BA5C500041A1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAppCheck;
+		};
+		C00949FA2D0BA5C500041A1F /* FirebaseAppDistribution-Beta */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C00949F12D0BA5C500041A1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseAppDistribution-Beta";
+		};
+		C00949FD2D0BA64900041A1F /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C00949FC2D0BA64900041A1F /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
+		};
+		C041203A2D11DDC8006292CF /* MessageKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C04120392D11DDBF006292CF /* XCRemoteSwiftPackageReference "MessageKit" */;
+			productName = MessageKit;
+		};
+		C041203D2D11E045006292CF /* InputBarAccessoryView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C041203C2D11E03B006292CF /* XCRemoteSwiftPackageReference "InputBarAccessoryView" */;
+			productName = InputBarAccessoryView;
+		};
+		C04D47742D0C9BEE00C32737 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C00949F12D0BA5C500041A1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		C04D47762D0C9BF700C32737 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C00949F12D0BA5C500041A1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = C04844D52D0392E100034F07 /* Project object */;
+}
