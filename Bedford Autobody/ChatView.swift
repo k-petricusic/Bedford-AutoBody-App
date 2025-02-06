@@ -11,12 +11,14 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     private var messages = [MessageType]()
     private let timeIntervalThreshold: TimeInterval = 300 // 5 minutes
     private let activityIndicator = UIActivityIndicatorView(style: .large)
-    
+    private var adminId: String? // Admin user ID will be fetched dynamically
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupActivityIndicator()
         setupMessageKit()
+        fetchAdminId() // Fetch the admin ID on view load
         fetchMessages()
     }
     
@@ -45,13 +47,30 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
         messagesCollectionView.reloadData()
         messagesCollectionView.scrollToLastItem()
         inputBar.inputTextView.text = ""
+        
+        // Notify the admin about the new message
+        sendNotificationToAdmin(message: text)
+    }
+
+    private func fetchAdminId() {
+        db.collection("users").whereField("email", isEqualTo: "K@gmail.com").getDocuments { snapshot, error in
+            if let error = error {
+                print("Error fetching admin ID: \(error.localizedDescription)")
+            } else if let document = snapshot?.documents.first {
+                self.adminId = document.documentID
+                print("Admin ID fetched: \(self.adminId ?? "Unknown")")
+            } else {
+                print("Admin account not found.")
+            }
+        }
     }
 
     private func saveMessageToFirestore(_ message: Message) {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
+        guard let userId = Auth.auth().currentUser?.uid, let adminId = adminId else { return }
         let text = extractText(from: message)
         let messageData: [String: Any] = [
             "senderId": message.sender.senderId,
+            "receiverId": adminId,
             "userId": userId,
             "displayName": (message.sender as? Sender)?.displayName ?? "",
             "messageId": message.messageId,
@@ -92,6 +111,47 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
             }
     }
 
+    private func sendNotificationToAdmin(message: String) {
+        guard let adminId = adminId, let userId = Auth.auth().currentUser?.uid else {
+            print("Admin ID or user ID is missing.")
+            return
+        }
+
+        // Fetch the current user's name
+        db.collection("users").document(userId).getDocument { document, error in
+            var customerName = "Customer" // Default name if not found
+            if let document = document, document.exists {
+                if let data = document.data(),
+                   let firstName = data["firstName"] as? String,
+                   let lastName = data["lastName"] as? String {
+                    customerName = "\(firstName) \(lastName)"
+                }
+            }
+
+            // Notification data
+            let notificationData: [String: Any] = [
+                "title": "New Message from \(customerName)",
+                "body": message,
+                "type": "message",
+                "date": Timestamp(date: Date()),
+                "isRead": false,
+                "userId": adminId, // Admin user ID
+                "data": ["senderId": userId, "text": message]
+            ]
+
+            // Save notification to Firestore
+            self.db.collection("users").document(adminId).collection("notifications")
+                .addDocument(data: notificationData) { error in
+                    if let error = error {
+                        print("Error sending notification to admin: \(error.localizedDescription)")
+                    } else {
+                        print("Notification sent to admin successfully!")
+                    }
+                }
+        }
+    }
+
+    
     private func extractText(from message: MessageType) -> String {
         switch message.kind {
         case .text(let messageText):
@@ -127,7 +187,7 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     }
 
     func cellTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
-        return cellTopLabelAttributedText(for: message, at: indexPath) != nil ? 30 : 0
+        return cellTopLabelAttributedText(for: message, at: indexPath) != nil ? 40 : 0
     }
 
     private func formatTimestamp(for date: Date) -> NSAttributedString {
@@ -155,5 +215,40 @@ class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelega
     
     func avatarSize(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGSize {
         return CGSize(width: 40, height: 40)
+    }
+    
+    func avatarImage(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIImage? {
+        if message.sender.senderId == currentUser.senderId {
+            // Customer's avatar (current user): Handled in `configureAvatarView`
+            return nil
+        } else {
+            // Admin's avatar: Use the custom image
+            return UIImage(named: "logo_small") // Replace with the custom image
+        }
+    }
+
+    func configureAvatarView(_ avatarView: AvatarView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
+        if message.sender.senderId == currentUser.senderId {
+            // Customer's avatar: Use the first letter of their first name
+            let userId = Auth.auth().currentUser?.uid ?? ""
+            let db = Firestore.firestore()
+            
+            db.collection("users").document(userId).getDocument { document, error in
+                if let document = document, document.exists {
+                    let firstName = document.data()?["firstName"] as? String ?? "C"
+                    let initials = String(firstName.prefix(1))
+                    DispatchQueue.main.async {
+                        avatarView.set(avatar: Avatar(initials: initials))
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        avatarView.set(avatar: Avatar(initials: "C"))
+                    }
+                }
+            }
+        } else {
+            // Admin's avatar: Use the custom image
+            avatarView.image = UIImage(named: "logo_small")
+        }
     }
 }

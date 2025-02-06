@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Rules for the users collection
+    match /users/{userId} {
+      // Allow admin access to all user data
+      allow read: if request.auth.token.email == "K@gmail.com";
+
+      // Allow authenticated users to access their own data
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // General authenticated read and write access for other collections
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
+

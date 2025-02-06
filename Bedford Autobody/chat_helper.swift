@@ -23,3 +23,4 @@ struct Message: MessageType {
     var sentDate: Date
     var kind: MessageKit.MessageKind
 }
+

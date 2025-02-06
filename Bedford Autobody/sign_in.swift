@@ -2,6 +2,7 @@ import SwiftUI
 import Security
 import FirebaseFirestore
 import FirebaseAuth
+import FirebaseMessaging
 
 struct SignUpScreen: View {
     @State private var firstName = ""
@@ -102,23 +103,25 @@ struct SignUpScreen: View {
                             return
                         }
 
-                        // Save additional user info to Firestore
-                        let db = Firestore.firestore()
-                        db.collection("users").document(authResult!.user.uid).setData([
-                            "firstName": firstName,
-                            "lastName": lastName,
-                            "email": email
-                        ]) { error in
-                            if let error = error {
-                                DispatchQueue.main.async {
-                                    alertMessage = "Failed to save user info: \(error.localizedDescription)"
-                                    showAlert = true
+                        if let user = authResult?.user {
+                            // Save additional user info to Firestore
+                            let db = Firestore.firestore()
+                            db.collection("users").document(user.uid).setData([
+                                "firstName": firstName,
+                                "lastName": lastName,
+                                "email": email
+                            ]) { error in
+                                if let error = error {
+                                    DispatchQueue.main.async {
+                                        alertMessage = "Failed to save user info: \(error.localizedDescription)"
+                                        showAlert = true
+                                    }
+                                    return
                                 }
-                                return
+                                updateFCMToken(for: user)
+                                isSignedUp = true // Navigate to HomeScreen
                             }
                         }
-                        
-                        isSignedUp = true // Navigate to HomeScreen
                     }
                 }) {
                     Text("Sign Up")
@@ -140,6 +143,26 @@ struct SignUpScreen: View {
                 Alert(title: Text("Alert"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
             }
             .padding()
+        }
+    }
+    
+    // Update FCM Token for the newly signed-up user
+    func updateFCMToken(for firebaseUser: FirebaseAuth.User) {
+        Messaging.messaging().token { token, error in
+            if let error = error {
+                print("Error retrieving FCM token: \(error.localizedDescription)")
+            } else if let token = token {
+                let db = Firestore.firestore()
+                db.collection("users").document(firebaseUser.uid).updateData([
+                    "fcmToken": token
+                ]) { error in
+                    if let error = error {
+                        print("Error updating FCM token in Firestore: \(error.localizedDescription)")
+                    } else {
+                        print("FCM token updated successfully for user \(firebaseUser.uid)")
+                    }
+                }
+            }
         }
     }
 }

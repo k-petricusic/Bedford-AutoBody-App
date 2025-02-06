@@ -1,5 +1,7 @@
 import SwiftUI
 import FirebaseAuth
+import FirebaseMessaging
+import FirebaseFirestore
 
 struct LogInScreen: View {
     @Environment(\.colorScheme) var colorScheme
@@ -48,9 +50,10 @@ struct LogInScreen: View {
                                 alertMessage = "Login Failed: \(error.localizedDescription)"
                                 showAlert = true
                             }
-                        } else {
+                        } else if let user = authResult?.user {
                             // Successful Login
                             DispatchQueue.main.async {
+                                updateFCMToken(for: user) // Update FCM token for the logged-in user
                                 isLoggedIn = true
                             }
                         }
@@ -85,6 +88,26 @@ struct LogInScreen: View {
             if resetCredentials {
                 email = ""
                 password = ""
+            }
+        }
+    }
+    
+    // Update FCM Token for the logged-in user
+    func updateFCMToken(for firebaseUser: FirebaseAuth.User) {
+        Messaging.messaging().token { token, error in
+            if let error = error {
+                print("Error retrieving FCM token: \(error.localizedDescription)")
+            } else if let token = token {
+                let db = Firestore.firestore()
+                db.collection("users").document(firebaseUser.uid).updateData([
+                    "fcmToken": token
+                ]) { error in
+                    if let error = error {
+                        print("Error updating FCM token in Firestore: \(error.localizedDescription)")
+                    } else {
+                        print("FCM token updated successfully for user \(firebaseUser.uid)")
+                    }
+                }
             }
         }
     }

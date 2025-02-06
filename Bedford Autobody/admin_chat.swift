@@ -8,7 +8,7 @@ class AdminChatView: MessagesViewController, MessagesDataSource, MessagesLayoutD
     private let currentUser = Sender(senderId: "admin", displayName: "Admin")
     private let db = Firestore.firestore()
     private var messages = [MessageType]()
-    private var selectedUserId: String
+    private var selectedUserId: String // The customer ID for this chat
     private let timeIntervalThreshold: TimeInterval = 300 // 5 minutes
     private let activityIndicator = UIActivityIndicatorView(style: .large)
     
@@ -54,12 +54,16 @@ class AdminChatView: MessagesViewController, MessagesDataSource, MessagesLayoutD
         messagesCollectionView.reloadData()
         messagesCollectionView.scrollToLastItem()
         inputBar.inputTextView.text = ""
+        
+        // Notify the customer about the new message
+        sendNotificationToCustomer(message: text)
     }
 
     private func saveMessageToFirestore(_ message: Message) {
         let text = extractText(from: message)
         let messageData: [String: Any] = [
             "senderId": message.sender.senderId,
+            "receiverId": selectedUserId, // Message is directed to the customer
             "userId": selectedUserId,
             "displayName": (message.sender as? Sender)?.displayName ?? "",
             "messageId": message.messageId,
@@ -67,6 +71,27 @@ class AdminChatView: MessagesViewController, MessagesDataSource, MessagesLayoutD
             "text": text
         ]
         db.collection("messages").addDocument(data: messageData)
+    }
+
+    private func sendNotificationToCustomer(message: String) {
+        let notificationData: [String: Any] = [
+            "title": "New Message",
+            "body": message,
+            "type": "message",
+            "date": Timestamp(date: Date()),
+            "isRead": false,
+            "userId": selectedUserId, // Customer user ID
+            "data": ["senderId": currentUser.senderId, "text": message]
+        ]
+        
+        db.collection("users").document(selectedUserId).collection("notifications")
+            .addDocument(data: notificationData) { error in
+                if let error = error {
+                    print("Error sending notification to customer: \(error.localizedDescription)")
+                } else {
+                    print("Notification sent to customer successfully!")
+                }
+            }
     }
 
     private func fetchMessages(for userId: String) {
@@ -123,23 +148,18 @@ class AdminChatView: MessagesViewController, MessagesDataSource, MessagesLayoutD
     
     // MARK: - MessagesLayoutDelegate
     func cellTopLabelAttributedText(for message: MessageType, at indexPath: IndexPath) -> NSAttributedString? {
-        // Show timestamp for the first message in the list
         if indexPath.section == 0 {
             return formatTimestamp(for: message.sentDate)
         }
-
-        // Show timestamp if the time gap between messages exceeds the threshold
         let previousMessage = messages[indexPath.section - 1] as! MessageType
         if message.sentDate.timeIntervalSince(previousMessage.sentDate) > timeIntervalThreshold {
             return formatTimestamp(for: message.sentDate)
         }
-
         return nil
     }
 
     func cellTopLabelHeight(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGFloat {
-        // Allocate space for the timestamp label if it’s displayed
-        return cellTopLabelAttributedText(for: message, at: indexPath) != nil ? 30 : 0
+        return cellTopLabelAttributedText(for: message, at: indexPath) != nil ? 40 : 0
     }
 
     private func formatTimestamp(for date: Date) -> NSAttributedString {
@@ -168,4 +188,39 @@ class AdminChatView: MessagesViewController, MessagesDataSource, MessagesLayoutD
     func avatarSize(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> CGSize {
         return CGSize(width: 40, height: 40)
     }
+    
+    func avatarImage(for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) -> UIImage? {
+        if message.sender.senderId == currentUser.senderId {
+            // Admin's avatar: Use the custom image
+            return UIImage(named: "logo_small")
+        } else {
+            // Customer's avatar: Handled in `configureAvatarView`
+            return nil
+        }
+    }
+
+    func configureAvatarView(_ avatarView: AvatarView, for message: MessageType, at indexPath: IndexPath, in messagesCollectionView: MessagesCollectionView) {
+        if message.sender.senderId == currentUser.senderId {
+            // Admin's avatar: Use the custom image
+            avatarView.image = UIImage(named: "logo_small")
+        } else {
+            // Customer's avatar: Use the first letter of their first name
+            let db = Firestore.firestore()
+            
+            db.collection("users").document(selectedUserId).getDocument { document, error in
+                if let document = document, document.exists {
+                    let firstName = document.data()?["firstName"] as? String ?? "C"
+                    let initials = String(firstName.prefix(1))
+                    DispatchQueue.main.async {
+                        avatarView.set(avatar: Avatar(initials: initials))
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        avatarView.set(avatar: Avatar(initials: "C"))
+                    }
+                }
+            }
+        }
+    }
+
 }

@@ -13,3 +13,4 @@ struct MaintenanceLog: Identifiable, Codable {
         self.date = date
     }
 }
+

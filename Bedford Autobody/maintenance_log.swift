@@ -7,99 +7,86 @@ struct MaintenanceLogScreen: View {
     @State private var maintenanceType: String = ""
     @State private var showAlert = false
     @State private var logs: [MaintenanceLog] = [] // Container for all logs
+    @State private var currentUserEmail: String? = nil // Tracks the current user's email
+    @State private var opacity: Double = 0.0 // For fade-in animation
 
     var body: some View {
         VStack {
             Text("Maintenance Log")
                 .font(.largeTitle)
                 .padding()
+                .onAppear {
+                    withAnimation(.easeIn(duration: 1.0)) {
+                        opacity = 1.0
+                    }
+                }
             
             if let car = car {
-                List(logs) { log in
-                    VStack(alignment: .leading) {
-                        Text(log.type)
-                            .font(.headline)
-                        Text("Date: \(log.date.formatted())")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                    }
-                }
-                
-                Button(action: {
-                    showAlert = true
-                }) {
-                    Text("Add Maintenance Log")
+                if logs.isEmpty {
+                    Text("No maintenance logs available for this car.")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
                         .padding()
-                        .frame(minWidth: 200)
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                }
-                .alert("Add Maintenance Log", isPresented: $showAlert) {
-                    TextField("Maintenance Type", text: $maintenanceType)
-                    Button("Save") {
-                        addMaintenanceLog()
+                        .opacity(opacity) // Apply fade-in effect
+                        .onAppear {
+                            withAnimation(.easeIn(duration: 1.0)) {
+                                opacity = 1.0
+                            }
+                        }
+                } else {
+                    List(logs) { log in
+                        VStack(alignment: .leading) {
+                            Text(log.type)
+                                .font(.headline)
+                            Text("Date: \(log.date.formatted())")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                        }
+                        .opacity(opacity) // Apply fade-in effect for each log
+                        .onAppear {
+                            withAnimation(.easeIn(duration: 0.5)) {
+                                opacity = 1.0
+                            }
+                        }
                     }
-                    Button("Cancel", role: .cancel) {}
                 }
             } else {
-                Text("No car selected. Please select a car first")
+                Text("No car selected. Please select a car first.")
                     .foregroundColor(.gray)
+                    .opacity(opacity) // Apply fade-in effect
+                    .onAppear {
+                        withAnimation(.easeIn(duration: 1.0)) {
+                            opacity = 1.0
+                        }
+                    }
             }
         }
         .onAppear {
             fetchMaintenanceLogs()  // Listen for real-time updates
+            fetchCurrentUserEmail() // Fetch the current user's email
         }
     }
     
-    private func addMaintenanceLog() {
-        guard let carId = car?.id else {
-            print("Car ID is nil. Cannot create Maintenance Log.")
-            return
-        }
-        
-        if maintenanceType.isEmpty {
-            print("Maintenance type is empty. Log not created.")
-            return
-        }
-        
-        let newLog = MaintenanceLog(
-            id: UUID().uuidString,
-            carId: carId,
-            type: maintenanceType,
-            date: Date()
-        )
-        
-        saveLogToFirestore(log: newLog)
-        logs.append(newLog) // Update local logs immediately after adding
-        maintenanceType = ""
-    }
-    
-    private func saveLogToFirestore(log: MaintenanceLog) {
-        guard let carId = car?.id else { return }
-        let db = Firestore.firestore()
-        
-        do {
-            try db.collection("cars").document(carId).collection("maintenanceLogs")
-                .document(log.id ?? "PROBLEM HERE")
-                .setData(from: log) { error in
-                    if let error = error {
-                        print("Error saving log to Firestore: \(error.localizedDescription)")
-                    } else {
-                        print("Log successfully saved!")
-                    }
-                }
-        } catch {
-            print("Error encoding log: \(error.localizedDescription)")
+    private func fetchCurrentUserEmail() {
+        if let user = Auth.auth().currentUser {
+            currentUserEmail = user.email
+            print("Fetched Email: \(currentUserEmail ?? "No email found")") // Debugging line
+        } else {
+            print("No user is logged in.") // Debugging line
         }
     }
-    
+
     private func fetchMaintenanceLogs() {
-        guard let carId = car?.id else { return }
+        guard let car = car, let carId = car.id else { return }
+        guard let user = Auth.auth().currentUser else { return }
         let db = Firestore.firestore()
 
         // Listen for real-time updates in the 'maintenanceLogs' collection
-        db.collection("cars").document(carId).collection("maintenanceLogs")
+        db.collection("users")
+            .document(user.uid)
+            .collection("cars")
+            .document(carId)
+            .collection("maintenanceLogs")
             .order(by: "date", descending: true)  // Optional: to show most recent first
             .addSnapshotListener { snapshot, error in
                 if let error = error {

@@ -6,6 +6,8 @@ struct DisplayCars: View {
     @Binding var cars: [Car]
     @Binding var selectedCar: Car?
     @State private var showingAddCarView = false
+    @State private var carOffsetY: CGFloat = 0 // Vertical offset for bounce animation
+    @State private var isBouncing = false // Animation state
 
     var body: some View {
         NavigationStack {
@@ -16,8 +18,23 @@ struct DisplayCars: View {
                     .padding(.top)
                 
                 if cars.isEmpty {
-                    Text("You haven't added any cars yet.")
-                        .padding()
+                    VStack {
+                        Text("You haven't added any cars yet.")
+                            .padding()
+
+                        ZStack {
+                            Image(systemName: "car.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 50)
+                                .foregroundColor(.blue)
+                                .offset(y: carOffsetY)
+                                .onAppear {
+                                    startBounceAnimation()
+                                }
+                        }
+                        .frame(height: 100)
+                    }
                 } else {
                     List {
                         ForEach(cars) { car in
@@ -32,7 +49,7 @@ struct DisplayCars: View {
                                         Spacer()
                                         if selectedCar?.id == car.id {
                                             Image(systemName: "checkmark")
-                                                .foregroundColor(.blue) // Optional: styling for the checkmark
+                                                .foregroundColor(.blue)
                                         }
                                     }
                                 }
@@ -42,7 +59,6 @@ struct DisplayCars: View {
                     }
                 }
                 
-                // In the logic for adding a new car:
                 Button(action: {
                     showingAddCarView.toggle()
                 }) {
@@ -55,21 +71,29 @@ struct DisplayCars: View {
                         .cornerRadius(10)
                 }
                 .sheet(isPresented: $showingAddCarView, onDismiss: {
-                    fetchCarsFromFirestore() // Refresh cars after adding a new one
+                    fetchCarsFromFirestore()
                 }) {
-                    AddCarView(cars: $cars)  // Pass the binding to the parent `cars` array
+                    AddCarView(cars: $cars)
                 }
-                
             }
             .navigationTitle("Your Cars")
             .padding()
             .onAppear {
-                fetchCarsFromFirestore() // Ensure cars are fetched when the view appears
+                fetchCarsFromFirestore()
             }
         }
     }
+
+    func startBounceAnimation() {
+        withAnimation(
+            Animation
+                .easeInOut(duration: 1.0)
+                .repeatForever(autoreverses: true)
+        ) {
+            carOffsetY = -20 // Bounce upward
+        }
+    }
     
-    // Save selected car ID to Firestore
     func saveSelectedCar(_ car: Car) {
         guard let user = Auth.auth().currentUser else { return }
         guard let carId = car.id else { return }
@@ -95,25 +119,20 @@ struct DisplayCars: View {
                 if let error = error {
                     print("Error fetching cars: \(error.localizedDescription)")
                 } else {
-                    // Update the cars array with the id after fetching
                     self.cars = querySnapshot?.documents.compactMap { document in
                         var car = try? document.data(as: Car.self)
-                        car?.id = document.documentID // Update the car with Firestore ID
+                        car?.id = document.documentID
                         return car
                     } ?? []
                     
-                    // Auto-select the first car if no car is selected yet
                     if selectedCar == nil && !self.cars.isEmpty {
-                        selectedCar = self.cars.first // Select the first car
-                        saveSelectedCar(self.cars.first!) // Optionally, save the selected car
+                        selectedCar = self.cars.first
+                        saveSelectedCar(self.cars.first!)
                     }
                 }
             }
     }
 
-
-    
-    // Ensure to check for the first car when the list of cars is updated.
     func deleteCar(at offsets: IndexSet) {
         guard let user = Auth.auth().currentUser else { return }
         let db = Firestore.firestore()
@@ -135,14 +154,11 @@ struct DisplayCars: View {
             }
         }
         
-        // Remove the car from the local array
         cars.remove(atOffsets: offsets)
         
-        // Auto-select the first car if there are any remaining cars
         if selectedCar == nil && !cars.isEmpty {
             selectedCar = cars.first
-            saveSelectedCar(cars.first!)  // Optionally, save the selected car
+            saveSelectedCar(cars.first!)
         }
     }
-
 }
