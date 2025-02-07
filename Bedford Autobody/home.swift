@@ -12,7 +12,6 @@ struct HomeScreen: View {
     @State private var cars: [Car] = []
     @State private var selectedCar: Car? = nil
     @State private var showCarSelection = false
-    @State private var showMaintenanceLog = false
     @State private var showChatView = false
     @State private var showAdminMenu = false
     @State private var isAdmin = false
@@ -29,61 +28,6 @@ struct HomeScreen: View {
 
 
     let adminEmail = "K@gmail.com"
-
-    func fetchUserName() {
-        guard let user = Auth.auth().currentUser else { return }
-        let uid = user.uid
-
-        let db = Firestore.firestore()
-        db.collection("users").document(uid).getDocument { document, error in
-            if let error = error {
-                print("Error fetching user data: \(error.localizedDescription)")
-                self.firstName = "User"
-                self.lastName = ""
-            } else if let document = document, document.exists {
-                let data = document.data()
-                self.firstName = data?["firstName"] as? String ?? "User"
-                self.lastName = data?["lastName"] as? String ?? ""
-            } else {
-                self.firstName = "User"
-                self.lastName = ""
-            }
-        }
-    }
-
-    func checkAdminStatus() {
-        guard let user = Auth.auth().currentUser else { return }
-        isAdmin = (user.email?.lowercased() == adminEmail.lowercased())
-    }
-
-    func fetchCarsFromFirestore() {
-        guard let user = Auth.auth().currentUser else { return }
-
-        let db = Firestore.firestore()
-        db.collection("users").document(user.uid).collection("cars")
-            .getDocuments { querySnapshot, error in
-                if let error = error {
-                    print("Error fetching cars: \(error.localizedDescription)")
-                } else {
-                    self.cars = querySnapshot?.documents.compactMap { document in
-                        try? document.data(as: Car.self)
-                    } ?? []
-
-                    db.collection("users").document(user.uid).getDocument { document, error in
-                        if let error = error {
-                            print("Error fetching last selected car ID: \(error.localizedDescription)")
-                        } else if let document = document, document.exists {
-                            if let lastSelectedCarId = document.data()?["lastSelectedCarId"] as? String {
-                                if let car = self.cars.first(where: { $0.id == lastSelectedCarId }) {
-                                    self.selectedCar = car
-                                    animateProgress() // Animate when car is selected
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-    }
 
     func animateProgress() {
         animatedProgress = 0.0 // Start from the beginning
@@ -128,71 +72,6 @@ struct HomeScreen: View {
             isHopping = false
         }
     }
-
-    func checkUnreadNotifications() {
-        let db = Firestore.firestore()
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-
-        db.collection("users").document(userId).collection("notifications")
-            .whereField("isRead", isEqualTo: false)
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    print("Error checking unread notifications: \(error.localizedDescription)")
-                } else {
-                    self.unreadNotifications = snapshot?.documents.count ?? 0
-                }
-            }
-    }
-
-    func handleLogout() {
-        guard let user = Auth.auth().currentUser else { return }
-        let db = Firestore.firestore()
-
-        db.collection("users").document(user.uid).updateData([
-            "fcmToken": FieldValue.delete()
-        ]) { error in
-            if let error = error {
-                print("Error removing FCM token: \(error.localizedDescription)")
-            } else {
-                print("FCM token removed successfully for user \(user.uid)")
-            }
-
-            do {
-                try Auth.auth().signOut()
-                isLoggedOut = true
-            } catch let signOutError {
-                print("Error signing out: \(signOutError.localizedDescription)")
-            }
-        }
-    }
-    
-    private func fetchPDFURL(completion: @escaping (String?) -> Void) {
-        guard let carId = selectedCar?.id, let ownerId = Auth.auth().currentUser?.uid else {
-            print("Error: Missing car or user ID.")
-            completion(nil)
-            return
-        }
-
-        let db = Firestore.firestore()
-        db.collection("users")
-            .document(ownerId)
-            .collection("cars")
-            .document(carId)
-            .collection("pdfs")
-            .order(by: "timestamp", descending: true) // Fetch the most recent PDF
-            .limit(to: 1)
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    print("Error fetching PDF URL: \(error.localizedDescription)")
-                    completion(nil)
-                } else if let document = snapshot?.documents.first, let url = document.data()["url"] as? String {
-                    completion(url)
-                } else {
-                    print("No PDFs found.")
-                    completion(nil)
-                }
-            }
-    }
     
     var body: some View {
         NavigationStack {
@@ -231,7 +110,6 @@ struct HomeScreen: View {
                     // New Placeholder Section
                     JobEstimateSection(
                         selectedCar: selectedCar,
-                        fetchPDFURL: fetchPDFURL,
                         selectedPDFURL: $selectedPDFURL,
                         showPDFViewer: $showPDFViewer
                     )
@@ -272,7 +150,11 @@ struct HomeScreen: View {
                     }
                     
                     Button(action: {
-                        handleLogout()
+                        handleLogout { success in
+                            if success {
+                                isLoggedOut = true
+                            }
+                        }
                     }) {
                         Text("Logout")
                             .font(.headline)
@@ -290,10 +172,26 @@ struct HomeScreen: View {
             .cornerRadius(10)
             .navigationBarBackButtonHidden(true)
             .onAppear {
-                fetchUserName()
-                fetchCarsFromFirestore()
-                checkAdminStatus()
-                checkUnreadNotifications() // Check for unread notifications
+                fetchUserName { firstName, lastName in
+                    self.firstName = firstName
+                    self.lastName = lastName
+                }
+                
+                fetchCars { cars, selectedCar in
+                    self.cars = cars
+                    self.selectedCar = selectedCar
+                    if selectedCar != nil {
+                        animateProgress()
+                    }
+                }
+                
+                checkAdminStatus { isAdmin in
+                    self.isAdmin = isAdmin
+                }
+                
+                checkUnreadNotifications { count in
+                    self.unreadNotifications = count
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -323,10 +221,6 @@ struct HomeScreen: View {
                             Label("Your Cars", systemImage: "car.fill")
                         }
                         
-                        NavigationLink(destination: MaintenanceLogScreen(car: $selectedCar), isActive: $showMaintenanceLog) {
-                            Label("Maintenance Log", systemImage: "wrench.fill")
-                        }
-                        
                         NavigationLink(destination: ImagesScreen(carId: selectedCar?.id ?? "")) {
                             Label("Images", systemImage: "photo.artframe")
                         }
@@ -335,11 +229,6 @@ struct HomeScreen: View {
                             Label("FAQ", systemImage: "questionmark.circle")
                         }
                         
-                        Button(action: {
-                            handleLogout()
-                        }) {
-                            Label("Logout", systemImage: "arrow.right.circle.fill")
-                        }
                     } label: {
                         Image(systemName: "ellipsis.circle")
                             .foregroundColor(.blue)

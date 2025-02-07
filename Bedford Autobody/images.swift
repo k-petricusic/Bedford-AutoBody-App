@@ -56,36 +56,13 @@ struct ImagesScreen: View {
             }
         }
     }
-
+    
     private func fetchImages() {
-        guard let userId = Auth.auth().currentUser?.uid else {
-            errorMessage = "User not logged in."
-            isLoading = false
-            return
+        fetchCarImages(carId: carId) { images, error in
+            self.images = images
+            self.errorMessage = error
+            self.isLoading = false
         }
-
-        let db = Firestore.firestore()
-        db.collection("users")
-            .document(userId)
-            .collection("cars")
-            .document(carId)
-            .collection("images")
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    errorMessage = error.localizedDescription
-                    isLoading = false
-                    return
-                }
-
-                guard let documents = snapshot?.documents else {
-                    errorMessage = "No images found for this car."
-                    isLoading = false
-                    return
-                }
-
-                self.images = documents.compactMap { $0.data()["url"] as? String }
-                self.isLoading = false
-            }
     }
 }
 

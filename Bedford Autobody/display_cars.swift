@@ -7,7 +7,6 @@ struct DisplayCars: View {
     @Binding var selectedCar: Car?
     @State private var showingAddCarView = false
     @State private var carOffsetY: CGFloat = 0 // Vertical offset for bounce animation
-    @State private var isBouncing = false // Animation state
 
     var body: some View {
         NavigationStack {
@@ -40,8 +39,8 @@ struct DisplayCars: View {
                         ForEach(cars) { car in
                             HStack {
                                 Button(action: {
-                                    selectedCar = car // Update selected car
-                                    saveSelectedCar(car)
+                                    selectedCar = car
+                                    saveCar(car)
                                 }) {
                                     HStack {
                                         Text("\(car.year) \(car.make) \(car.model)")
@@ -71,7 +70,7 @@ struct DisplayCars: View {
                         .cornerRadius(10)
                 }
                 .sheet(isPresented: $showingAddCarView, onDismiss: {
-                    fetchCarsFromFirestore()
+                    loadCars()
                 }) {
                     AddCarView(cars: $cars)
                 }
@@ -79,7 +78,7 @@ struct DisplayCars: View {
             .navigationTitle("Your Cars")
             .padding()
             .onAppear {
-                fetchCarsFromFirestore()
+                loadCars()
             }
         }
     }
@@ -90,75 +89,39 @@ struct DisplayCars: View {
                 .easeInOut(duration: 1.0)
                 .repeatForever(autoreverses: true)
         ) {
-            carOffsetY = -20 // Bounce upward
+            carOffsetY = -20
         }
     }
     
-    func saveSelectedCar(_ car: Car) {
-        guard let user = Auth.auth().currentUser else { return }
+    func saveCar(_ car: Car) {
         guard let carId = car.id else { return }
-        let db = Firestore.firestore()
-        
-        db.collection("users").document(user.uid).updateData([
-            "lastSelectedCarId": carId
-        ]) { error in
-            if let error = error {
-                print("Error saving selected car ID: \(error.localizedDescription)")
-            } else {
-                print("Selected car ID saved successfully!")
+        saveSelectedCar(carId: carId) { success in
+            if success {
+                print("Selected car updated.")
             }
         }
     }
     
-    func fetchCarsFromFirestore() {
-        guard let user = Auth.auth().currentUser else { return }
-        let db = Firestore.firestore()
-
-        db.collection("users").document(user.uid).collection("cars")
-            .getDocuments { querySnapshot, error in
-                if let error = error {
-                    print("Error fetching cars: \(error.localizedDescription)")
-                } else {
-                    self.cars = querySnapshot?.documents.compactMap { document in
-                        var car = try? document.data(as: Car.self)
-                        car?.id = document.documentID
-                        return car
-                    } ?? []
-                    
-                    if selectedCar == nil && !self.cars.isEmpty {
-                        selectedCar = self.cars.first
-                        saveSelectedCar(self.cars.first!)
-                    }
-                }
-            }
+    func loadCars() {
+        fetchCars { fetchedCars, fetchedSelectedCar in
+            self.cars = fetchedCars
+            self.selectedCar = fetchedSelectedCar
+        }
     }
 
     func deleteCar(at offsets: IndexSet) {
-        guard let user = Auth.auth().currentUser else { return }
-        let db = Firestore.firestore()
-        
         for index in offsets {
             let car = cars[index]
             guard let carId = car.id else { continue }
-            
-            if selectedCar?.id == carId {
-                selectedCar = nil
-            }
-            
-            db.collection("users").document(user.uid).collection("cars").document(carId).delete { error in
-                if let error = error {
-                    print("Error deleting car: \(error.localizedDescription)")
-                } else {
-                    print("Car deleted successfully!")
+
+            deleteSelectedCar(carId: carId) { success in
+                if success {
+                    cars.remove(at: index)
+                    if selectedCar?.id == carId {
+                        selectedCar = nil
+                    }
                 }
             }
-        }
-        
-        cars.remove(atOffsets: offsets)
-        
-        if selectedCar == nil && !cars.isEmpty {
-            selectedCar = cars.first
-            saveSelectedCar(cars.first!)
         }
     }
 }

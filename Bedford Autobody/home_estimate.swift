@@ -1,8 +1,8 @@
 import SwiftUI
+import FirebaseAuth
 
 struct JobEstimateSection: View {
     var selectedCar: Car?
-    var fetchPDFURL: (@escaping (String?) -> Void) -> Void
     @Binding var selectedPDFURL: URL?
     @Binding var showPDFViewer: Bool
 
@@ -17,12 +17,18 @@ struct JobEstimateSection: View {
                 Text("Estimate Total: $\(String(format: "%.2f", estimateTotal))")
                     .font(.headline)
                     .foregroundColor(estimateTotal > 0 ? .green : .black)
-                
-                // Show the button only if estimateTotal > 0
+
+                // Show "View Estimate" button only if estimateTotal > 0
                 if estimateTotal > 0 {
                     Button(action: {
-                        fetchPDFURL { urlString in
+                        guard let carId = selectedCar?.id, let ownerId = Auth.auth().currentUser?.uid else {
+                            print("Error: Missing car or user ID.")
+                            return
+                        }
+
+                        fetchPDFURL(forCarId: carId, ownerId: ownerId) { urlString in
                             guard let urlString = urlString, let url = URL(string: urlString) else {
+                                print("Error: Invalid or missing PDF URL.")
                                 return
                             }
                             print("Fetched URL: \(url)")

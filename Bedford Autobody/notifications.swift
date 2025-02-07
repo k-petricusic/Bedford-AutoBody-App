@@ -71,7 +71,7 @@ struct NotificationsScreen: View {
                         .padding()
                         .background(
                             Color(notification.isRead ? .clear : .blue.opacity(0.1))
-                                .animation(.easeInOut(duration: 1.5), value: notification.isRead) // Smooth fade animation
+                                .animation(.easeInOut(duration: 1.5), value: notification.isRead)
                         )
                         .cornerRadius(8)
                     }
@@ -90,71 +90,41 @@ struct NotificationsScreen: View {
     }
 
     func fetchAndMarkAsRead() {
-        let db = Firestore.firestore()
-        guard let userId = Auth.auth().currentUser?.uid else {
-            errorMessage = "User not logged in."
-            isLoading = false
-            return
-        }
-
-        db.collection("users").document(userId).collection("notifications")
-            .order(by: "date", descending: true)
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    print("Error fetching notifications: \(error.localizedDescription)")
-                    self.errorMessage = "Failed to fetch notifications."
-                } else {
-                    self.notifications = snapshot?.documents.compactMap { document in
-                        try? document.data(as: Notification.self)
-                    } ?? []
-
-                    // Mark unread notifications as read
-                    let unreadNotifications = self.notifications.filter { !$0.isRead }
-                    for notification in unreadNotifications {
-                        markAsRead(notification, userId: userId)
-                    }
-                }
-                self.isLoading = false
+        fetchNotifications { fetchedNotifications, error in
+            if let error = error {
+                self.errorMessage = error
+            } else {
+                self.notifications = fetchedNotifications
+                markAllAsRead()
             }
+            self.isLoading = false
+        }
     }
 
-    func markAsRead(_ notification: Notification, userId: String) {
-        guard let notificationId = notification.id else { return }
-
-        let db = Firestore.firestore()
-        db.collection("users").document(userId).collection("notifications").document(notificationId)
-            .updateData(["isRead": true]) { error in
-                if let error = error {
-                    print("Error marking notification as read: \(error.localizedDescription)")
-                } else {
-                    if let index = notifications.firstIndex(where: { $0.id == notification.id }) {
+    func markAllAsRead() {
+        for index in notifications.indices where !notifications[index].isRead {
+            if let notificationId = notifications[index].id {
+                markNotificationAsRead(notificationId: notificationId) { success in
+                    if success {
                         withAnimation {
                             notifications[index].isRead = true
                         }
                     }
                 }
             }
+        }
     }
 
     func deleteNotifications(at offsets: IndexSet) {
-        let db = Firestore.firestore()
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-
         for index in offsets {
-            let notification = notifications[index]
-            guard let notificationId = notification.id else { continue }
-
-            db.collection("users").document(userId).collection("notifications").document(notificationId)
-                .delete { error in
-                    if let error = error {
-                        print("Error deleting notification: \(error.localizedDescription)")
-                    } else {
-                        print("Notification deleted successfully!")
+            if let notificationId = notifications[index].id {
+                deleteNotification(notificationId: notificationId) { success in
+                    if success {
+                        notifications.remove(atOffsets: offsets)
                     }
                 }
+            }
         }
-
-        notifications.remove(atOffsets: offsets)
     }
 
     func formatDate(_ date: Date) -> String {

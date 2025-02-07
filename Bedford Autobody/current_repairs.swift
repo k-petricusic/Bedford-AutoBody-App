@@ -37,47 +37,10 @@ struct CurrentRepairsScreen: View {
         }
         .navigationTitle("Current Repairs")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear(perform: fetchOngoingRepairs)
-    }
-
-    func fetchOngoingRepairs() {
-        let db = Firestore.firestore()
-
-        db.collection("users").getDocuments { snapshot, error in
-            if let error = error {
-                print("Error fetching users: \(error.localizedDescription)")
-                self.errorMessage = "Failed to fetch users."
-                self.isLoading = false
-                return
-            }
-
-            guard let userDocuments = snapshot?.documents else {
-                self.errorMessage = "No users found."
-                self.isLoading = false
-                return
-            }
-
-            let group = DispatchGroup()
-            var fetchedCars: [Car] = []
-
-            for userDocument in userDocuments {
-                group.enter()
-                db.collection("users")
-                    .document(userDocument.documentID)
-                    .collection("cars")
-                    .whereField("currentRepairState", isNotEqualTo: "Ready for pickup") // Exclude "Ready for pickup" cars
-                    .getDocuments { carSnapshot, carError in
-                        if let carError = carError {
-                            print("Error fetching cars: \(carError.localizedDescription)")
-                        } else if let carDocuments = carSnapshot?.documents {
-                            fetchedCars += carDocuments.compactMap { try? $0.data(as: Car.self) }
-                        }
-                        group.leave()
-                    }
-            }
-
-            group.notify(queue: .main) {
-                self.cars = fetchedCars
+        .onAppear {
+            fetchOngoingRepairs { cars, errorMessage in
+                self.cars = cars
+                self.errorMessage = errorMessage
                 self.isLoading = false
             }
         }

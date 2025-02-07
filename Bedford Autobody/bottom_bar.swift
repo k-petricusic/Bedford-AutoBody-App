@@ -8,11 +8,11 @@ import SwiftUI
 
 struct BottomMenuView: View {
     @Binding var selectedTab: Int // Keeps track of the active tab
-    
     var body: some View {
         HStack {
             Spacer()
             
+            // Home Button
             Button(action: {
                 selectedTab = 0
             }) {
@@ -28,6 +28,7 @@ struct BottomMenuView: View {
 
             Spacer()
             
+            // Cars Button
             Button(action: {
                 selectedTab = 1
             }) {
@@ -43,13 +44,14 @@ struct BottomMenuView: View {
 
             Spacer()
             
+            // Chat Button
             Button(action: {
                 selectedTab = 2
             }) {
                 VStack {
-                    Image(systemName: "bell.fill")
+                    Image(systemName: "bubble.left.and.bubble.right.fill")
                         .font(.system(size: 24))
-                    Text("Notifications")
+                    Text("Chat")
                         .font(.caption)
                 }
             }
@@ -58,6 +60,7 @@ struct BottomMenuView: View {
 
             Spacer()
             
+            // FAQ Button
             Button(action: {
                 selectedTab = 3
             }) {
@@ -70,12 +73,28 @@ struct BottomMenuView: View {
             }
             .foregroundColor(selectedTab == 3 ? .blue : .gray)
             .padding()
+
+            Spacer()
+            
+            // Profile/User Settings Button
+            Button(action: {
+                selectedTab = 4
+            }) {
+                VStack {
+                    Image(systemName: "person.fill")
+                        .font(.system(size: 24))
+                    Text("Profile")
+                        .font(.caption)
+                }
+            }
+            .foregroundColor(selectedTab == 4 ? .blue : .gray)
+            .padding()
             
             Spacer()
         }
         .frame(height: 60)
-        .frame(maxWidth: .infinity) // Ensure it stretches across the screen
-        .background(Color(.systemGray6).ignoresSafeArea(edges: .bottom)) // Extend background past safe area
+        .frame(maxWidth: .infinity)
+        .background(Color(.systemGray6).ignoresSafeArea(edges: .bottom))
         .shadow(radius: 2)
     }
 }

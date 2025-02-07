@@ -79,45 +79,6 @@ struct CarDetailView: View {
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(10)
 
-                // Maintenance Records Section
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Maintenance Records")
-                        .font(.title2)
-                        .bold()
-
-                    Button(action: {
-                        showMaintenanceLogs = true
-                    }) {
-                        Text("View Maintenance Records")
-                            .font(.headline)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.green)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }
-
-                    Button(action: {
-                        showAddMaintenanceAlert = true
-                    }) {
-                        Text("Add Maintenance Record")
-                            .font(.headline)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.orange)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    }
-                    .alert("Add Maintenance Record", isPresented: $showAddMaintenanceAlert) {
-                        TextField("Maintenance Type", text: $maintenanceType)
-                        Button("Save", action: addMaintenanceRecord)
-                        Button("Cancel", role: .cancel, action: {})
-                    }
-                }
-                .padding()
-                .background(Color.gray.opacity(0.1))
-                .cornerRadius(10)
-
                 // Add Image Section
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Images")
@@ -248,12 +209,7 @@ struct CarDetailView: View {
             Text("Are you sure you want to change the repair state to '\(selectedState)'?")
         }
         .background(
-            NavigationLink(
-                destination: MaintenanceLogScreen(car: .constant(car)),
-                isActive: $showMaintenanceLogs
-            ) {
-                EmptyView()
-            }
+
         )
     }
 
@@ -309,60 +265,6 @@ struct CarDetailView: View {
                     )
                 }
             }
-    }
-
-    private func addMaintenanceRecord() {
-        guard let carId = car.id else {
-            print("Error: Car ID is nil.")
-            return
-        }
-        guard let ownerId = car.ownerId else {
-            print("Error: Owner ID is nil. Cannot determine customer database path.")
-            return
-        }
-
-        if maintenanceType.isEmpty {
-            print("Error: Maintenance type is empty.")
-            return
-        }
-
-        let newLog = MaintenanceLog(
-            id: UUID().uuidString,
-            carId: carId,
-            type: maintenanceType,
-            date: Date()
-        )
-
-        let db = Firestore.firestore()
-        let logRef = db.collection("users")
-            .document(ownerId)
-            .collection("cars")
-            .document(carId)
-            .collection("maintenanceLogs")
-            .document(newLog.id ?? UUID().uuidString)
-
-        do {
-            try logRef.setData(from: newLog) { error in
-                if let error = error {
-                    print("Error saving maintenance log: \(error.localizedDescription)")
-                } else {
-                    print("Maintenance log saved successfully!")
-
-                    // Send notification to customer
-                    NotificationHelper.createNotification(
-                        for: ownerId,
-                        title: "New Maintenance Record Added",
-                        body: "A new maintenance record (\(maintenanceType)) has been added for your car: \(car.make) \(car.model).",
-                        type: "maintenance",
-                        data: ["carId": carId, "maintenanceType": maintenanceType]
-                    )
-
-                    maintenanceType = "" // Reset the maintenance type field
-                }
-            }
-        } catch {
-            print("Error encoding maintenance log: \(error.localizedDescription)")
-        }
     }
 
     private func uploadImage() {
