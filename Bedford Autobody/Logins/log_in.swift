@@ -79,7 +79,7 @@ struct LogInScreen: View {
             .cornerRadius(10)
             
             // Navigate to HomeScreen if login is successful
-            NavigationLink(destination: HomeScreen(email: $email), isActive: $isLoggedIn) {
+            NavigationLink(destination: NaviView(), isActive: $isLoggedIn) {
                 EmptyView()
             }
         }

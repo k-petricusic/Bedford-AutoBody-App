@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-struct FAQScreen: View {
+struct FAQView: View {
     @State private var expandedSections: [String: Bool] = [:] // Tracks expanded state for each section
 
     var body: some View {

@@ -225,7 +225,7 @@ struct HomeScreen: View {
                             Label("Images", systemImage: "photo.artframe")
                         }
                         
-                        NavigationLink(destination: FAQScreen()) {
+                        NavigationLink(destination: FAQView()) {
                             Label("FAQ", systemImage: "questionmark.circle")
                         }
                         

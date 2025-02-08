@@ -135,7 +135,7 @@ struct SignUpScreen: View {
                 }
                 
                 // NavigationLink for HomeScreen
-                NavigationLink(destination: HomeScreen(email: $email), isActive: $isSignedUp) {
+                NavigationLink(destination: NaviView(), isActive: $isSignedUp) {
                     EmptyView()
                 }
             }
