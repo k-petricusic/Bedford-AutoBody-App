@@ -19,6 +19,7 @@ struct Car: Identifiable, Decodable, Encodable {
     var repairStates: [String] // Repair states array
     var currentRepairState: String // Current repair state
     var estimateTotal: Double? // Holds the total estimate amount
+    var estimatedPickupDate: String? // 🔹 NEW FIELD - Stores the pickup date
 
     init(
         id: String? = nil,
@@ -30,7 +31,8 @@ struct Car: Identifiable, Decodable, Encodable {
         color: String,
         repairStates: [String] = ["Estimate Updates", "Parts Ordered", "Repair in Progress", "Painting", "Final Inspection", "Ready for pickup"],
         currentRepairState: String = "Estimate Updates",
-        estimateTotal: Double? = nil // Initialize with nil
+        estimateTotal: Double? = nil, // Initialize with nil
+        estimatedPickupDate: String? = nil // 🔹 NEW: Default to nil
     ) {
         self.id = id
         self.ownerId = ownerId // Initialize ownerId
@@ -42,5 +44,6 @@ struct Car: Identifiable, Decodable, Encodable {
         self.repairStates = repairStates
         self.currentRepairState = currentRepairState
         self.estimateTotal = estimateTotal // Set initial value for estimate total
+        self.estimatedPickupDate = estimatedPickupDate // Set initial value for estimated pickup date
     }
 }

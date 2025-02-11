@@ -7,43 +7,40 @@
 
 import SwiftUI
 
-struct AnimationHelper {
-    
-    static func animateProgress(selectedCar: Car?, animatedProgress: Binding<Double>, carOffsetY: Binding<CGFloat>, confettiCounter: Binding<Int>) {
-        animatedProgress.wrappedValue = 0.0
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            if let repairStates = selectedCar?.repairStates,
-               let currentRepairState = selectedCar?.currentRepairState,
-               let currentIndex = repairStates.firstIndex(of: currentRepairState) {
-                let progress = Double(currentIndex) / Double(repairStates.count - 1)
-                withAnimation(.easeOut(duration: 2.0)) {
-                    animatedProgress.wrappedValue = progress
-                }
+func animateProgress(selectedCar: Car?, animatedProgress: Binding<Double>, carOffsetY: Binding<CGFloat>, confettiCounter: Binding<Int>) {
+    animatedProgress.wrappedValue = 0.0
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        if let repairStates = selectedCar?.repairStates,
+           let currentRepairState = selectedCar?.currentRepairState,
+           let currentIndex = repairStates.firstIndex(of: currentRepairState) {
+            let progress = Double(currentIndex) / Double(repairStates.count - 1)
+            withAnimation(.easeOut(duration: 2.0)) {
+                animatedProgress.wrappedValue = progress
+            }
 
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                performCarHop(carOffsetY: carOffsetY)
+            }
+
+            if currentRepairState == "Ready for pickup" {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                    performCarHop(carOffsetY: carOffsetY)
-                }
-
-                if currentRepairState == "Ready for pickup" {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                        confettiCounter.wrappedValue += 1
-                    }
+                    confettiCounter.wrappedValue += 1
                 }
             }
         }
     }
+}
 
-    static func performCarHop(carOffsetY: Binding<CGFloat>) {
-        guard carOffsetY.wrappedValue == 0 else { return } // Prevent multiple hops
+func performCarHop(carOffsetY: Binding<CGFloat>) {
+    guard carOffsetY.wrappedValue == 0 else { return } // Prevent multiple hops
 
-        withAnimation(.easeOut(duration: 0.3)) {
-            carOffsetY.wrappedValue = -20
-        }
+    withAnimation(.easeOut(duration: 0.3)) {
+        carOffsetY.wrappedValue = -20
+    }
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            withAnimation(.easeIn(duration: 0.3)) {
-                carOffsetY.wrappedValue = 0
-            }
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+        withAnimation(.easeIn(duration: 0.3)) {
+            carOffsetY.wrappedValue = 0
         }
     }
 }

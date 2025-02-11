@@ -9,6 +9,7 @@ struct AddCarView: View {
     @State private var year = ""
     @State private var vin = "" // VIN input field
     @State private var color = "" // Color input field
+    @State private var estimatedPickupDate = "" // Estimated Pickup Date input field
     @State private var showAlert = false // For displaying the alert
     @Environment(\.presentationMode) var presentationMode // Access the presentation mode
 
@@ -33,6 +34,9 @@ struct AddCarView: View {
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
             TextField("Color", text: $color)
+                .padding()
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+            TextField("Estimated Pickup Date (Optional)", text: $estimatedPickupDate)
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
 
@@ -80,36 +84,21 @@ struct AddCarView: View {
             return
         }
 
-        // Create a new car with the entered details and default estimateTotal
+        // Create a new car with the entered details and optional estimatedPickupDate
         let newCar = Car(
-            ownerId: user.uid, // Set ownerId to the authenticated user's ID
+            ownerId: user.uid,
             make: make,
             model: model,
             year: year,
             vin: vin,
             color: color,
-            estimateTotal: 0.0 // Default estimate total
+            estimateTotal: 0.0, // Default estimate total
+            estimatedPickupDate: estimatedPickupDate.isEmpty ? nil : estimatedPickupDate
         )
         cars.append(newCar) // Append the new car to the local list
 
-        let db = Firestore.firestore()
-        let carRef = db.collection("users")
-            .document(user.uid)
-            .collection("cars")
-            .document() // Create a new document in the user's "cars" subcollection
-
-        // Save car data to Firestore
-        do {
-            try carRef.setData(from: newCar) { error in
-                if let error = error {
-                    print("Error adding car to Firestore: \(error.localizedDescription)")
-                } else {
-                    print("Car added to Firestore successfully!")
-                }
-            }
-        } catch {
-            print("Error encoding car data: \(error.localizedDescription)")
-        }
+        // Save to Firestore using helper function
+        addCarToFirestore(car: newCar, userId: user.uid)
 
         // Dismiss the AddCarView
         presentationMode.wrappedValue.dismiss()

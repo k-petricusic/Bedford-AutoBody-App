@@ -301,3 +301,65 @@ func deleteNotification(notificationId: String, completion: @escaping (Bool) -> 
             }
         }
 }
+
+// Function to add a new car to Firestore
+func addCarToFirestore(car: Car, userId: String) {
+    let db = Firestore.firestore()
+    let carRef = db.collection("users")
+        .document(userId)
+        .collection("cars")
+        .document()
+
+    do {
+        try carRef.setData(from: car) { error in
+            if let error = error {
+                print("Error adding car to Firestore: \(error.localizedDescription)")
+            } else {
+                print("Car added successfully!")
+            }
+        }
+    } catch {
+        print("Error encoding car data: \(error.localizedDescription)")
+    }
+}
+
+// Function to fetch estimated pickup date for a car
+func fetchEstimatedPickupDate(userId: String, carId: String, completion: @escaping (String?) -> Void) {
+    let db = Firestore.firestore()
+    let carRef = db.collection("users")
+        .document(userId)
+        .collection("cars")
+        .document(carId)
+
+    carRef.getDocument { document, error in
+        if let error = error {
+            print("Error fetching estimated pickup date: \(error.localizedDescription)")
+            completion(nil)
+        } else if let document = document, document.exists {
+            let data = document.data()
+            let pickupDate = data?["estimatedPickupDate"] as? String
+            completion(pickupDate)
+        } else {
+            completion(nil)
+        }
+    }
+}
+
+// Function to update estimated pickup date
+func updateEstimatedPickupDate(userId: String, carId: String, newDate: String, completion: @escaping (Bool) -> Void) {
+    let db = Firestore.firestore()
+    let carRef = db.collection("users")
+        .document(userId)
+        .collection("cars")
+        .document(carId)
+
+    carRef.updateData(["estimatedPickupDate": newDate]) { error in
+        if let error = error {
+            print("Error updating pickup date: \(error.localizedDescription)")
+            completion(false)
+        } else {
+            print("Pickup date updated successfully!")
+            completion(true)
+        }
+    }
+}

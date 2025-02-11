@@ -77,7 +77,7 @@ struct HomeScreen: View {
         NavigationStack {
             ScrollView {
                 VStack {
-                    WelcomeMessage(firstName: firstName, lastName: lastName, colorScheme: colorScheme)
+                    WelcomeMessage(firstName: firstName, colorScheme: colorScheme)
                     if selectedCar == nil {
                         VStack {
                             Text("Please select a car")
@@ -108,7 +108,7 @@ struct HomeScreen: View {
                     }
                     
                     // New Placeholder Section
-                    JobEstimateSection(
+                    EstimateSection(
                         selectedCar: selectedCar,
                         selectedPDFURL: $selectedPDFURL,
                         showPDFViewer: $showPDFViewer
