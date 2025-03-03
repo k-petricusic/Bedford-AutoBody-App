@@ -3,11 +3,11 @@ import FirebaseFirestore
 import FirebaseAuth
 
 struct DisplayCars: View {
-    @Binding var cars: [Car]
+    @State private var cars: [Car] = []
     @Binding var selectedCar: Car?
     @State private var showingAddCarView = false
-    @State private var carOffsetY: CGFloat = 0 // Vertical offset for bounce animation
-
+    @State private var carOffsetY: CGFloat = 0 // Bounce animation state
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -20,7 +20,7 @@ struct DisplayCars: View {
                     VStack {
                         Text("You haven't added any cars yet.")
                             .padding()
-
+                        
                         ZStack {
                             Image(systemName: "car.fill")
                                 .resizable()
@@ -37,21 +37,24 @@ struct DisplayCars: View {
                 } else {
                     List {
                         ForEach(cars) { car in
-                            HStack {
-                                Button(action: {
-                                    selectedCar = car
-                                    saveCar(car)
-                                }) {
-                                    HStack {
+                            Button(action: {
+                                selectCar(car)
+                            }) {
+                                HStack {
+                                    VStack(alignment: .leading) {
                                         Text("\(car.year) \(car.make) \(car.model)")
-                                            .padding(.leading)
-                                        Spacer()
-                                        if selectedCar?.id == car.id {
-                                            Image(systemName: "checkmark")
-                                                .foregroundColor(.blue)
-                                        }
+                                            .font(.headline)
+                                        Text("VIN: \(car.vin)")
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    }
+                                    Spacer()
+                                    if selectedCar?.id == car.id {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundColor(.blue)
                                     }
                                 }
+                                .padding(.vertical, 5)
                             }
                         }
                         .onDelete(perform: deleteCar)
@@ -76,14 +79,16 @@ struct DisplayCars: View {
                 }
             }
             .navigationTitle("Your Cars")
+            .navigationBarTitleDisplayMode(.inline)
             .padding()
             .onAppear {
                 loadCars()
             }
         }
     }
-
-    func startBounceAnimation() {
+    
+    // 🔹 Bounce animation function
+    private func startBounceAnimation() {
         withAnimation(
             Animation
                 .easeInOut(duration: 1.0)
@@ -93,32 +98,48 @@ struct DisplayCars: View {
         }
     }
     
-    func saveCar(_ car: Car) {
+    // 🔹 Select a car, persist selection, and **force UI refresh**
+    private func selectCar(_ car: Car) {
         guard let carId = car.id else { return }
+        selectedCar = car
         saveSelectedCar(carId: carId) { success in
             if success {
-                print("Selected car updated.")
+                DispatchQueue.main.async {
+                    self.loadCars()
+                    self.selectedCar = car
+                }
             }
         }
     }
     
-    func loadCars() {
+    // 🔹 Load all cars from Firestore **and ensure the correct car is selected**
+    private func loadCars() {
         fetchCars { fetchedCars, fetchedSelectedCar in
-            self.cars = fetchedCars
-            self.selectedCar = fetchedSelectedCar
+            DispatchQueue.main.async {
+                self.cars = fetchedCars
+                if let selected = fetchedSelectedCar {
+                    self.selectedCar = selected
+                } else if let firstCar = fetchedCars.first {
+                    self.selectCar(firstCar)
+                }
+            }
         }
     }
-
-    func deleteCar(at offsets: IndexSet) {
+    
+    // 🔹 Delete a car and update selection **only if necessary**
+    private func deleteCar(at offsets: IndexSet) {
         for index in offsets {
             let car = cars[index]
             guard let carId = car.id else { continue }
-
+            
             deleteSelectedCar(carId: carId) { success in
                 if success {
-                    cars.remove(at: index)
-                    if selectedCar?.id == carId {
-                        selectedCar = nil
+                    DispatchQueue.main.async {
+                        cars.remove(at: index)
+                        if selectedCar?.id == carId {
+                            selectedCar = nil
+                            loadCars()
+                        }
                     }
                 }
             }

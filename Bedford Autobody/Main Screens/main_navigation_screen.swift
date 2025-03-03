@@ -17,7 +17,7 @@ struct NaviView: View {
                 switch selectedTab {
                 case 0: HomeView()
                 case 1: CarView()
-                case 2: ChatViewTEST()
+                case 2: ChatView()
                 case 3: FAQView()
                 case 4: ProfileView()
                 default: HomeView()

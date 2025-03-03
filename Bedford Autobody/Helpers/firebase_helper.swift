@@ -7,6 +7,7 @@
 
 import FirebaseFirestore
 import FirebaseAuth
+import FirebaseStorage
 
 func fetchUserName(completion: @escaping (String, String) -> Void) {
     guard let user = Auth.auth().currentUser else {
@@ -360,6 +361,107 @@ func updateEstimatedPickupDate(userId: String, carId: String, newDate: String, c
         } else {
             print("Pickup date updated successfully!")
             completion(true)
+        }
+    }
+}
+
+func saveProfile(fullName: String, email: String, phone: String, completion: @escaping (Bool, String?) -> Void) {
+    guard let userId = Auth.auth().currentUser?.uid else {
+        completion(false, "User not authenticated.")
+        return
+    }
+
+    let db = Firestore.firestore()
+    let userRef = db.collection("users").document(userId)
+
+    // 🔹 Split fullName into first and last name
+    let nameComponents = fullName.split(separator: " ")
+    let firstName = nameComponents.first ?? ""
+    let lastName = nameComponents.dropFirst().joined(separator: " ")
+
+    let updatedData: [String: Any] = [
+        "firstName": firstName,
+        "lastName": lastName,
+        "email": email,
+        "phone": phone
+    ]
+
+    userRef.updateData(updatedData) { error in
+        if let error = error {
+            print("Error updating profile: \(error.localizedDescription)")
+            completion(false, error.localizedDescription)
+        } else {
+            print("Profile updated successfully!")
+            completion(true, nil)
+        }
+    }
+}
+
+func uploadProfilePicture(image: UIImage, completion: @escaping (String?) -> Void) {
+    guard let userId = Auth.auth().currentUser?.uid else {
+        completion(nil)
+        return
+    }
+    
+    let storageRef = Storage.storage().reference().child("profile_pictures/\(userId).jpg")
+    
+    guard let imageData = image.jpegData(compressionQuality: 0.4) else {
+        completion(nil)
+        return
+    }
+    
+    let metadata = StorageMetadata()
+    metadata.contentType = "image/jpeg"
+    
+    storageRef.putData(imageData, metadata: metadata) { _, error in
+        if let error = error {
+            print("Error uploading profile picture: \(error.localizedDescription)")
+            completion(nil)
+            return
+        }
+        
+        storageRef.downloadURL { url, error in
+            if let error = error {
+                print("Error getting download URL: \(error.localizedDescription)")
+                completion(nil)
+            } else if let url = url {
+                saveProfilePictureURL(url: url.absoluteString)
+                completion(url.absoluteString)
+            }
+        }
+    }
+}
+
+func saveProfilePictureURL(url: String) {
+    guard let userId = Auth.auth().currentUser?.uid else { return }
+    
+    let db = Firestore.firestore()
+    db.collection("users").document(userId).updateData([
+        "profilePictureURL": url
+    ]) { error in
+        if let error = error {
+            print("Error saving profile picture URL: \(error.localizedDescription)")
+        } else {
+            print("Profile picture URL updated successfully.")
+        }
+    }
+}
+
+func fetchProfilePictureURL(completion: @escaping (String?) -> Void) {
+    guard let userId = Auth.auth().currentUser?.uid else {
+        completion(nil)
+        return
+    }
+    
+    let db = Firestore.firestore()
+    db.collection("users").document(userId).getDocument { document, error in
+        if let error = error {
+            print("Error fetching profile picture URL: \(error.localizedDescription)")
+            completion(nil)
+        } else if let data = document?.data(), let url = data["profilePictureURL"] as? String {
+            completion(url)
+        } else {
+            completion(nil)
         }
     }
 }

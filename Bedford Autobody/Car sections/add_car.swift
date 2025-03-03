@@ -36,10 +36,7 @@ struct AddCarView: View {
             TextField("Color", text: $color)
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-            TextField("Estimated Pickup Date (Optional)", text: $estimatedPickupDate)
-                .padding()
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-
+    
             // Save Car Button
             Button(action: {
                 saveCar()

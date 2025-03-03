@@ -4,14 +4,14 @@ import FirebaseFirestore
 import SDWebImageSwiftUI
 
 struct ImagesScreen: View {
-    var carId: String // Holds the ID of the selected car
-    @State private var images: [String] = [] // Holds URLs of images
-    @State private var isLoading = true // Loading state
-    @State private var errorMessage: String? = nil // Error state
-    @State private var selectedImage: IdentifiableIndex? = nil // To show the magnified image with swipe navigation
+    var carId: String
+    @State private var images: [String] = []
+    @State private var isLoading = true
+    @State private var errorMessage: String? = nil
+    @State private var selectedImage: IdentifiableIndex? = nil
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 if isLoading {
                     ProgressView("Loading Images...")
@@ -34,14 +34,14 @@ struct ImagesScreen: View {
                 } else {
                     ScrollView {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 20) {
-                            ForEach(images.indices, id: \ .self) { index in
+                            ForEach(images.indices, id: \.self) { index in
                                 WebImage(url: URL(string: images[index]))
                                     .resizable()
                                     .scaledToFit()
                                     .frame(height: 100)
                                     .cornerRadius(10)
                                     .onTapGesture {
-                                        selectedImage = IdentifiableIndex(id: index) // Set the selected image index
+                                        selectedImage = IdentifiableIndex(id: index)
                                     }
                             }
                         }
@@ -50,6 +50,7 @@ struct ImagesScreen: View {
                 }
             }
             .navigationTitle("Car Images")
+            .navigationBarTitleDisplayMode(.inline)
             .onAppear(perform: fetchImages)
             .fullScreenCover(item: $selectedImage) { imageItem in
                 ImageFullScreenView(images: images, selectedIndex: imageItem.id)
@@ -73,7 +74,7 @@ struct ImageFullScreenView: View {
 
     var body: some View {
         TabView(selection: $selectedIndex) {
-            ForEach(images.indices, id: \ .self) { index in
+            ForEach(images.indices, id: \.self) { index in
                 WebImage(url: URL(string: images[index]))
                     .resizable()
                     .scaledToFit()
@@ -100,8 +101,4 @@ struct ImageFullScreenView: View {
             }
         )
     }
-}
-
-struct IdentifiableIndex: Identifiable {
-    let id: Int
 }

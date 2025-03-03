@@ -49,3 +49,7 @@ struct ImagePicker: UIViewControllerRepresentable {
         }
     }
 }
+
+struct IdentifiableIndex: Identifiable {
+    let id: Int
+}

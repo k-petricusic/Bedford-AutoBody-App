@@ -1,10 +1,18 @@
+//
+//  ChatView.swift
+//  Bedford Autobody
+//
+//  Created by Bedford Autobody on 2/14/25.
+//
+
+
 import UIKit
 import MessageKit
 import InputBarAccessoryView
 import FirebaseFirestore
 import FirebaseAuth
 
-class ChatView: MessagesViewController, MessagesDataSource, MessagesLayoutDelegate, MessagesDisplayDelegate, InputBarAccessoryViewDelegate {
+class Chat: MessagesViewController, MessagesDataSource, MessagesLayoutDelegate, MessagesDisplayDelegate, InputBarAccessoryViewDelegate {
     
     private let currentUser = Sender(senderId: "self", displayName: "Customer")
     private let db = Firestore.firestore()

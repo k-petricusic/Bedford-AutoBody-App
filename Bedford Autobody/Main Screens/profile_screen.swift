@@ -6,9 +6,31 @@
 //
 
 import SwiftUI
-    
+
 struct ProfileView: View {
     var body: some View {
-        Text("Profile")
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 20) {
+                    // Profile Header
+                    ProfileHeaderView()
+                    
+                    // Personal Info
+                    PersonalInfoView()
+
+                    // Account Settings
+                    AccountSettingsView()
+
+                    // Help & Support
+                    HelpSupportView()
+
+                    // Logout Button
+                    LogoutButtonView()
+                }
+                .padding()
+            }
+            .navigationTitle("Profile")
+            .navigationBarTitleDisplayMode(.inline)
+        }
     }
 }

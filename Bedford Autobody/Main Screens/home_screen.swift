@@ -12,6 +12,7 @@ struct HomeView: View {
     @State private var confettiCounter = 0
     @State private var selectedPDFURL: URL? = nil
     @State private var showPDFViewer = false
+    @State private var showingAddCarView = false // Tracks if the Add Car screen is open
 
     var body: some View {
         NavigationView {
@@ -20,42 +21,13 @@ struct HomeView: View {
                     // Welcome Message
                     WelcomeMessage(firstName: firstName, colorScheme: colorScheme)
                         .padding(.top, 20)
-                    
-                    // Add Space Before Estimate Section
+
                     Spacer().frame(height: 10)
 
                     if selectedCar == nil {
-                        VStack {
-                            Text("Please select a car")
-                                .font(.title2)
-                                .foregroundColor(.gray)
-                                .padding()
-
-                            Button(action: {
-                                fetchCars { cars, selectedCar in
-                                    self.cars = cars
-                                    self.selectedCar = selectedCar
-                                    if selectedCar != nil {
-                                        animateProgress(
-                                            selectedCar: selectedCar,
-                                            animatedProgress: $animatedProgress,
-                                            carOffsetY: $carOffsetY,
-                                            confettiCounter: $confettiCounter
-                                        )
-                                    }
-                                }
-                            }) {
-                                Text("Select Car")
-                                    .font(.headline)
-                                    .padding()
-                                    .frame(minWidth: 200)
-                                    .background(Color.blue)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(10)
-                            }
-                            .padding(.top, 20)
-                        }
-                        .padding()
+                        // 🔹 Ensures Only the Car Icon Bounces, Not the Whole Screen
+                        DefaultScreen(showingAddCarView: $showingAddCarView)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else {
                         // Estimate Section
                         EstimateSection(
@@ -101,6 +73,9 @@ struct HomeView: View {
                     )
                 }
             }
+        }
+        .sheet(isPresented: $showingAddCarView) {
+            DisplayCars(selectedCar: $selectedCar)
         }
     }
 }
