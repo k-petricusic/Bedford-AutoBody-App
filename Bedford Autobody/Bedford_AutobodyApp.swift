@@ -5,7 +5,6 @@ import UserNotifications
 import SwiftUI
 import FirebaseAuth
 
-
 class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUserNotificationCenterDelegate {
     
     var window: UIWindow?
@@ -13,6 +12,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Configure Firebase
         FirebaseApp.configure()
+        setupFirestore()
 
         // Request Notification Permissions
         UNUserNotificationCenter.current().delegate = self
@@ -29,13 +29,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
 
         // Set Messaging Delegate
         Messaging.messaging().delegate = self
+        print("✅ FCM Token: \(Messaging.messaging().fcmToken ?? "No token")")
 
         return true
     }
 
     // Handle APNs Device Token Registration
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        // Pass the device token to Firebase Messaging
         Messaging.messaging().apnsToken = deviceToken
         print("APNs device token registered: \(deviceToken.map { String(format: "%02.2hhx", $0) }.joined())")
     }
@@ -49,7 +49,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         if let fcmToken = fcmToken {
             print("FCM Token refreshed: \(fcmToken)")
-            // Send the FCM token to your server or use it for debugging
         } else {
             print("Failed to retrieve FCM Token")
         }
@@ -72,31 +71,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate, MessagingDelegate, UNUser
         print("Notification tapped: \(content.title) - \(content.body)")
         completionHandler()
     }
-
-    // Optional: Add debugging for Auto Layout Constraint Issues
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        NSLayoutConstraint.activate([])
-        print("Debugging activated: Constraint issues will be logged.")
-    }
 }
-
 
 @main
 struct Bedford_AutobodyApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    
-    @State private var isLoggedIn = false
-    
+    @State private var isCheckingAuth = true
+
     var body: some Scene {
         WindowGroup {
-            // Check if the user is logged in
-            if let user = Auth.auth().currentUser {
-                // User is logged in, show the HomeScreen
-                NaviView()
+            if isCheckingAuth {
+                LoadingScreen()
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            self.isCheckingAuth = false
+                        }
+                    }
             } else {
-                // User is not logged in, show the IntroScreen
-                IntroScreen()
+                if let _ = Auth.auth().currentUser {
+                    NaviView()
+                } else {
+                    IntroScreen()
+                }
             }
         }
     }

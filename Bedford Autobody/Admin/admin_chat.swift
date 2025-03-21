@@ -49,50 +49,75 @@ class AdminChatView: MessagesViewController, MessagesDataSource, MessagesLayoutD
             sentDate: Date(),
             kind: .text(text)
         )
+
         saveMessageToFirestore(newMessage)
-        messages.append(newMessage)
-        messagesCollectionView.reloadData()
-        messagesCollectionView.scrollToLastItem()
+        
+        DispatchQueue.main.async {
+            self.messages.append(newMessage)
+            self.messagesCollectionView.reloadData()
+            self.messagesCollectionView.scrollToLastItem()
+        }
+
+        // ✅ Fetch messages again to ensure UI is updated
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.fetchMessages(for: self.selectedUserId)
+        }
+
         inputBar.inputTextView.text = ""
         
         // Notify the customer about the new message
         sendNotificationToCustomer(message: text)
     }
 
+
     private func saveMessageToFirestore(_ message: Message) {
         let text = extractText(from: message)
+
         let messageData: [String: Any] = [
-            "senderId": message.sender.senderId,
-            "receiverId": selectedUserId, // Message is directed to the customer
-            "userId": selectedUserId,
-            "displayName": (message.sender as? Sender)?.displayName ?? "",
+            "senderId": message.sender.senderId, // ✅ Correct sender ID
+            "receiverId": selectedUserId, // ✅ Message is for the customer
+            "userId": selectedUserId, // ✅ User ID must match the customer
+            "displayName": message.sender.displayName,
             "messageId": message.messageId,
             "sentDate": message.sentDate,
-            "text": text
+            "text": text,
+            "isRead": false // ✅ Admin messages should be unread for the customer
         ]
-        db.collection("messages").addDocument(data: messageData)
+
+        db.collection("messages").addDocument(data: messageData) { error in
+            if let error = error {
+                print("❌ Error saving message: \(error.localizedDescription)")
+            } else {
+                print("✅ Message saved successfully with isRead: false")
+            }
+        }
     }
 
+
+
     private func sendNotificationToCustomer(message: String) {
-        let notificationData: [String: Any] = [
-            "title": "New Message",
-            "body": message,
-            "type": "message",
-            "date": Timestamp(date: Date()),
-            "isRead": false,
-            "userId": selectedUserId, // Customer user ID
-            "data": ["senderId": currentUser.senderId, "text": message]
-        ]
-        
-        db.collection("users").document(selectedUserId).collection("notifications")
-            .addDocument(data: notificationData) { error in
-                if let error = error {
-                    print("Error sending notification to customer: \(error.localizedDescription)")
+        let db = Firestore.firestore()
+
+        db.collection("users").document(selectedUserId).getDocument { document, error in
+            if let document = document, document.exists {
+                if let fcmToken = document.data()?["fcmToken"] as? String {
+                    print("📢 Sending push notification to customer with token: \(fcmToken)")
+
+                    // Send the push notification
+                    NotificationHelper.sendPushNotification(
+                        to: self.selectedUserId,
+                        title: "New Message from Bedford Autobody",
+                        body: message
+                    )
                 } else {
-                    print("Notification sent to customer successfully!")
+                    print("⚠️ No FCM token found for user \(self.selectedUserId)")
                 }
+            } else {
+                print("⚠️ User document does not exist")
             }
+        }
     }
+
 
     private func fetchMessages(for userId: String) {
         activityIndicator.startAnimating()
@@ -103,26 +128,59 @@ class AdminChatView: MessagesViewController, MessagesDataSource, MessagesLayoutD
             .addSnapshotListener { querySnapshot, error in
                 self.activityIndicator.stopAnimating()
                 if let error = error {
-                    print("Error fetching messages: \(error.localizedDescription)")
+                    print("❌ Error fetching messages: \(error.localizedDescription)")
                     return
                 }
+
+                var unreadMessageIds: [String] = []
+
                 self.messages = querySnapshot?.documents.compactMap { document in
                     let data = document.data()
-                    guard
-                        let senderId = data["senderId"] as? String,
-                        let displayName = data["displayName"] as? String,
-                        let messageId = data["messageId"] as? String,
-                        let sentDate = (data["sentDate"] as? Timestamp)?.dateValue(),
-                        let text = data["text"] as? String
-                    else { return nil }
+                    guard let senderId = data["senderId"] as? String,
+                          let displayName = data["displayName"] as? String,
+                          let messageId = data["messageId"] as? String,
+                          let sentDate = (data["sentDate"] as? Timestamp)?.dateValue(),
+                          let text = data["text"] as? String,
+                          let isRead = data["isRead"] as? Bool else { return nil }
+
+                    let docId = document.documentID
+
+                    // ✅ Collect unread messages sent by the customer
+                    if senderId != "admin" && !isRead {
+                        unreadMessageIds.append(docId)
+                    }
+
                     return Message(sender: Sender(senderId: senderId, displayName: displayName), messageId: messageId, sentDate: sentDate, kind: .text(text))
                 } ?? []
+
+                // ✅ Mark all unread messages as read
+                self.markMessagesAsRead(unreadMessageIds)
+
                 DispatchQueue.main.async {
                     self.messagesCollectionView.reloadData()
                     self.messagesCollectionView.scrollToLastItem()
                 }
             }
     }
+
+
+
+    private func markMessagesAsRead(_ messageIds: [String]) {
+        guard !messageIds.isEmpty else { return }
+
+        let db = Firestore.firestore()
+
+        for messageId in messageIds {
+            db.collection("messages").document(messageId).updateData(["isRead": true]) { error in
+                if let error = error {
+                    print("❌ Error marking message as read: \(error.localizedDescription)")
+                } else {
+                    print("✅ Message marked as read: \(messageId)")
+                }
+            }
+        }
+    }
+
 
     private func extractText(from message: MessageType) -> String {
         switch message.kind {
@@ -151,7 +209,7 @@ class AdminChatView: MessagesViewController, MessagesDataSource, MessagesLayoutD
         if indexPath.section == 0 {
             return formatTimestamp(for: message.sentDate)
         }
-        let previousMessage = messages[indexPath.section - 1] as! MessageType
+        let previousMessage = messages[indexPath.section - 1]
         if message.sentDate.timeIntervalSince(previousMessage.sentDate) > timeIntervalThreshold {
             return formatTimestamp(for: message.sentDate)
         }
@@ -224,3 +282,4 @@ class AdminChatView: MessagesViewController, MessagesDataSource, MessagesLayoutD
     }
 
 }
+

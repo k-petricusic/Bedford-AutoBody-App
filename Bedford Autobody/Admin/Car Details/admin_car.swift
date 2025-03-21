@@ -1,3 +1,10 @@
+//
+//  admin_car.swift
+//  Bedford Autobody
+//
+//  Created by Bedford Autobody on 3/5/25.
+//
+
 import SwiftUI
 import FirebaseFirestore
 import FirebaseAuth
@@ -142,9 +149,11 @@ struct CarDetailView: View {
                 .background(Color.gray.opacity(0.1))
                 .cornerRadius(10)
 
+                PickupDateUpdateSection(car: car)
+                
                 // New Placeholder Section
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("New Section Placeholder")
+                    Text("Estimate")
                         .font(.title2)
                         .bold()
 
@@ -193,14 +202,10 @@ struct CarDetailView: View {
         .sheet(isPresented: $showImagePicker) {
             ImagePicker(image: $selectedImage)
         }
-        .background(
-            NavigationLink(
-                destination: AdminImages(car: car),
-                isActive: $showAdminImages
-            ) {
-                EmptyView()
-            }
-        )
+        .navigationDestination(isPresented: $showAdminImages) {
+            AdminImages(car: car)
+        }
+
         .navigationTitle("Admin Car Details")
         .alert("Confirm Update", isPresented: $showConfirmation) {
             Button("Update", action: updateRepairState)
@@ -216,19 +221,14 @@ struct CarDetailView: View {
     private func sendEstimateUpdateNotification(ownerId: String, carId: String, newEstimate: Double) {
         let notificationTitle = "Estimate Updated"
         let notificationBody = "The estimate for your car \(car.make) \(car.model) has been updated to $\(String(format: "%.2f", newEstimate))."
-        let notificationData: [String: String] = [
-            "carId": carId,
-            "newEstimate": "\(newEstimate)"
-        ]
 
-        NotificationHelper.createNotification(
-            for: ownerId,
+        NotificationHelper.sendPushNotification(
+            to: ownerId,
             title: notificationTitle,
-            body: notificationBody,
-            type: "estimate",
-            data: notificationData
+            body: notificationBody
         )
     }
+
     
     private func updateRepairState() {
         guard let carId = car.id else {
@@ -256,12 +256,10 @@ struct CarDetailView: View {
                     presentationMode.wrappedValue.dismiss()
 
                     // Create a notification for the repair state change
-                    NotificationHelper.createNotification(
-                        for: ownerId,
+                    NotificationHelper.sendPushNotification(
+                        to: ownerId,
                         title: "Repair Status Update",
-                        body: "Your car's repair status has changed to \(selectedState).",
-                        type: "repair",
-                        data: ["carId": carId, "repairState": selectedState]
+                        body: "Your car's repair status has changed to \(selectedState)."
                     )
                 }
             }

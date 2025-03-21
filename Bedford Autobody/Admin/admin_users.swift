@@ -69,8 +69,8 @@ struct UsersList: View {
                 )
             }
         }
-        .onChange(of: searchText) { _ in
-            applySearchFilter() // Filter users as the search text changes
+        .onChange(of: searchText) {
+            applySearchFilter() // No need for `_ in`, directly call function
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {

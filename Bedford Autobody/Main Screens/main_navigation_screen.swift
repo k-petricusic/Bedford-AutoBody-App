@@ -8,28 +8,30 @@
 import SwiftUI
 
 struct NaviView: View {
+    @StateObject private var appData = AppDataViewModel() // ✅ Load global data once
     @State private var selectedTab = 0
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            // Content Area
-            ZStack {
-                switch selectedTab {
-                case 0: HomeView()
-                case 1: CarView()
-                case 2: ChatView()
-                case 3: FAQView()
-                case 4: ProfileView()
-                default: HomeView()
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .padding(.bottom, 15) // Adds space above the bottom bar
 
-            // Custom Bottom Bar
-            BottomMenuView(selectedTab: $selectedTab)
-                .background(Color(.systemGray6).ignoresSafeArea(edges: .bottom)) // Prevents clipping
-                .shadow(radius: 2)
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                ZStack {
+                    switch selectedTab {
+                    case 0: HomeView(appData: appData) // ✅ Pass only where needed
+                    case 1: CarView()
+                    case 2: ChatView()
+                    case 3: FAQView()
+                    case 4: ProfileView(appData: appData)
+                    default: HomeView(appData: appData)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.bottom, 15)
+
+                BottomMenuView(selectedTab: $selectedTab)
+                    .background(Color(.systemGray6).ignoresSafeArea(edges: .bottom))
+                    .shadow(radius: 2)
+            }
+            .navigationBarBackButtonHidden(true)
         }
     }
 }

@@ -109,18 +109,11 @@ struct UserDetailView: View {
         }
 
         // NavigationLink to AdminChatView
-        .background(
-            NavigationLink(
-                destination: VStack {
-                    AdminChatViewWrapper(userId: user.id)
-                        .navigationTitle("\(user.firstName) \(user.lastName)")
-                        .padding(.top, 20)
-                },
-                isActive: $showAdminChatView
-            ) {
-                EmptyView()
-            }
-        )
+        .navigationDestination(isPresented: $showAdminChatView) {
+            AdminChatViewWrapper(userId: user.id)
+                .navigationTitle("\(user.firstName) \(user.lastName)")
+                .padding(.top, 20)
+        }
     }
 
     // Fetch cars associated with the user
@@ -139,15 +132,4 @@ struct UserDetailView: View {
             }
         }
     }
-}
-
-// Wrapper for AdminChatView (UIKit in SwiftUI)
-struct AdminChatViewWrapper: UIViewControllerRepresentable {
-    var userId: String
-
-    func makeUIViewController(context: Context) -> AdminChatView {
-        return AdminChatView(userId: userId) // Pass the userId
-    }
-
-    func updateUIViewController(_ uiViewController: AdminChatView, context: Context) {}
 }

@@ -19,28 +19,3 @@ struct Notification: Identifiable, Codable {
     var data: [String: String]?           // Optional additional data for navigation or context
 }
 
-struct NotificationHelper {
-    static func createNotification(for userId: String, title: String, body: String, type: String, data: [String: String]?) {
-        let db = Firestore.firestore()
-        let notificationRef = db.collection("users").document(userId).collection("notifications").document()
-
-        let notificationData: [String: Any] = [
-            "id": notificationRef.documentID,
-            "title": title,
-            "body": body,
-            "type": type,
-            "date": Timestamp(date: Date()), // Save the current timestamp
-            "isRead": false,
-            "userId": userId,
-            "data": data ?? [:]
-        ]
-
-        notificationRef.setData(notificationData) { error in
-            if let error = error {
-                print("Error creating notification: \(error.localizedDescription)")
-            } else {
-                print("Notification created successfully!")
-            }
-        }
-    }
-}

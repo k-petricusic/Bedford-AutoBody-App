@@ -9,6 +9,12 @@ import FirebaseFirestore
 import FirebaseAuth
 import FirebaseStorage
 
+func setupFirestore() {
+    let settings = Firestore.firestore().settings
+    settings.cacheSettings = PersistentCacheSettings(sizeBytes: FirestoreCacheSizeUnlimited as NSNumber) // ✅ Use cacheSettings instead
+    Firestore.firestore().settings = settings
+}
+
 func fetchUserName(completion: @escaping (String, String) -> Void) {
     guard let user = Auth.auth().currentUser else {
         completion("User", "")
@@ -30,47 +36,96 @@ func fetchUserName(completion: @escaping (String, String) -> Void) {
     }
 }
 
-func checkAdminStatus(completion: @escaping (Bool) -> Void) {
-    guard let user = Auth.auth().currentUser else {
-        completion(false)
-        return
+func fetchUserNameById(userId: String, completion: @escaping (String) -> Void) {
+    let db = Firestore.firestore()
+    db.collection("users").document(userId).getDocument { document, error in
+        if let error = error {
+            print("❌ Error fetching user name for user \(userId): \(error.localizedDescription)")
+            completion("Unknown User")
+            return
+        }
+
+        if let data = document?.data(),
+           let firstName = data["firstName"] as? String,
+           let lastName = data["lastName"] as? String {
+            completion("\(firstName) \(lastName)")
+        } else {
+            print("⚠️ No name found for user \(userId)")
+            completion("Unknown User")
+        }
     }
-    let isAdmin = (user.email?.lowercased() == "K@gmail.com".lowercased())
-    completion(isAdmin)
 }
+
 
 func fetchCars(completion: @escaping ([Car], Car?) -> Void) {
     guard let user = Auth.auth().currentUser else {
         completion([], nil)
         return
     }
-    
+
     let db = Firestore.firestore()
     db.collection("users").document(user.uid).collection("cars")
         .getDocuments { querySnapshot, error in
             if let error = error {
-                print("Error fetching cars: \(error.localizedDescription)")
+                print("❌ Error fetching cars: \(error.localizedDescription)")
                 completion([], nil)
-            } else {
-                let cars = querySnapshot?.documents.compactMap { document in
-                    try? document.data(as: Car.self)
-                } ?? []
+                return
+            }
+
+            let cars: [Car] = querySnapshot?.documents.compactMap { document in
+                let data = document.data()
                 
-                db.collection("users").document(user.uid).getDocument { document, error in
-                    if let error = error {
-                        print("Error fetching last selected car ID: \(error.localizedDescription)")
-                        completion(cars, nil)
-                    } else if let document = document, document.exists,
-                              let lastSelectedCarId = document.data()?["lastSelectedCarId"] as? String,
-                              let selectedCar = cars.first(where: { $0.id == lastSelectedCarId }) {
-                        completion(cars, selectedCar)
-                    } else {
-                        completion(cars, nil)
-                    }
+                // ✅ Manually map Firestore fields to Car object
+                guard let id = document.documentID as String?,
+                      let make = data["make"] as? String,
+                      let model = data["model"] as? String,
+                      let year = data["year"] as? String,
+                      let color = data["color"] as? String,
+                      let vin = data["vin"] as? String,
+                      let currentRepairState = data["currentRepairState"] as? String else {
+                    print("⚠️ Skipping invalid car document: \(document.documentID)")
+                    return nil
+                }
+
+                // 🔹 New Fields
+                let submodel = data["submodel"] as? String ?? ""
+                let numDoors = data["numDoors"] as? Int ?? 4
+                let carType = data["carType"] as? String ?? "None"
+
+                let car = Car(
+                    id: id,
+                    make: make,
+                    model: model,
+                    submodel: submodel,
+                    year: year,
+                    vin: vin,
+                    color: color,
+                    numDoors: numDoors,
+                    carType: carType,
+                    currentRepairState: currentRepairState
+                )
+
+                print("✅ Car Loaded: \(car.make) \(car.model) - \(car.carType)")
+                return car
+            } ?? []
+
+            // Fetch last selected car
+            db.collection("users").document(user.uid).getDocument { document, error in
+                if let error = error {
+                    print("❌ Error fetching last selected car ID: \(error.localizedDescription)")
+                    completion(cars, nil)
+                } else if let document = document, document.exists,
+                          let lastSelectedCarId = document.data()?["lastSelectedCarId"] as? String,
+                          let selectedCar = cars.first(where: { $0.id == lastSelectedCarId }) {
+                    print("✅ Selected Car: \(selectedCar.make) \(selectedCar.model)")
+                    completion(cars, selectedCar)
+                } else {
+                    completion(cars, nil)
                 }
             }
         }
 }
+
 
 func checkUnreadNotifications(completion: @escaping (Int) -> Void) {
     let db = Firestore.firestore()
@@ -314,37 +369,55 @@ func addCarToFirestore(car: Car, userId: String) {
     do {
         try carRef.setData(from: car) { error in
             if let error = error {
-                print("Error adding car to Firestore: \(error.localizedDescription)")
+                print("❌ Error adding car to Firestore: \(error.localizedDescription)")
             } else {
-                print("Car added successfully!")
+                print("✅ Car added successfully with:")
+                print("   - Make: \(car.make)")
+                print("   - Model: \(car.model)")
+                print("   - Submodel: \(car.submodel)") // 🔹 New field
+                print("   - Year: \(car.year)")
+                print("   - VIN: \(car.vin)")
+                print("   - Color: \(car.color)")
+                print("   - Doors: \(car.numDoors)") // 🔹 New field
+                print("   - Type: \(car.carType)") // 🔹 New field
+                print("   - Current Repair State: \(car.currentRepairState)")
             }
         }
     } catch {
-        print("Error encoding car data: \(error.localizedDescription)")
+        print("❌ Error encoding car data: \(error.localizedDescription)")
     }
 }
 
 // Function to fetch estimated pickup date for a car
 func fetchEstimatedPickupDate(userId: String, carId: String, completion: @escaping (String?) -> Void) {
     let db = Firestore.firestore()
-    let carRef = db.collection("users")
+    
+    db.collection("users")
         .document(userId)
         .collection("cars")
         .document(carId)
+        .getDocument { document, error in
+            if let error = error {
+                print("❌ Error fetching pickup date: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
 
-    carRef.getDocument { document, error in
-        if let error = error {
-            print("Error fetching estimated pickup date: \(error.localizedDescription)")
-            completion(nil)
-        } else if let document = document, document.exists {
-            let data = document.data()
-            let pickupDate = data?["estimatedPickupDate"] as? String
-            completion(pickupDate)
-        } else {
-            completion(nil)
+            if let document = document, document.exists {
+                if let pickupDate = document.data()?["estimatedPickupDate"] as? String {
+                    print("✅ Retrieved Pickup Date: \(pickupDate)")
+                    completion(pickupDate)
+                } else {
+                    print("⚠️ No pickup date found in Firestore")
+                    completion(nil)
+                }
+            } else {
+                print("⚠️ Car document does not exist")
+                completion(nil)
+            }
         }
-    }
 }
+
 
 // Function to update estimated pickup date
 func updateEstimatedPickupDate(userId: String, carId: String, newDate: String, completion: @escaping (Bool) -> Void) {
@@ -398,70 +471,104 @@ func saveProfile(fullName: String, email: String, phone: String, completion: @es
 }
 
 func uploadProfilePicture(image: UIImage, completion: @escaping (String?) -> Void) {
-    guard let userId = Auth.auth().currentUser?.uid else {
+    guard let user = Auth.auth().currentUser else {
+        print("❌ No authenticated user. Cannot upload profile picture.")
         completion(nil)
         return
     }
     
-    let storageRef = Storage.storage().reference().child("profile_pictures/\(userId).jpg")
-    
-    guard let imageData = image.jpegData(compressionQuality: 0.4) else {
+    let userId = user.uid
+    let storagePath = "users/\(userId)/profile_picture.jpg" // ✅ Ensure it matches Firebase Rules
+
+    print("✅ Uploading to Firebase Storage Path: \(storagePath)") // 🔹 Debug the path
+
+    let storageRef = Storage.storage().reference()
+    let profilePicRef = storageRef.child(storagePath)
+
+    guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+        print("❌ Failed to convert image to data")
         completion(nil)
         return
     }
-    
-    let metadata = StorageMetadata()
-    metadata.contentType = "image/jpeg"
-    
-    storageRef.putData(imageData, metadata: metadata) { _, error in
+
+    profilePicRef.putData(imageData, metadata: nil) { _, error in
         if let error = error {
-            print("Error uploading profile picture: \(error.localizedDescription)")
+            print("❌ Error uploading profile picture: \(error.localizedDescription)")
             completion(nil)
             return
         }
-        
-        storageRef.downloadURL { url, error in
+
+        profilePicRef.downloadURL { url, error in
             if let error = error {
-                print("Error getting download URL: \(error.localizedDescription)")
+                print("❌ Error getting profile picture URL: \(error.localizedDescription)")
                 completion(nil)
-            } else if let url = url {
-                saveProfilePictureURL(url: url.absoluteString)
+                return
+            }
+
+            if let url = url {
+                print("✅ Profile picture uploaded successfully: \(url.absoluteString)")
+                saveProfilePictureURL(url.absoluteString)
                 completion(url.absoluteString)
             }
         }
     }
 }
 
-func saveProfilePictureURL(url: String) {
+
+
+private func saveProfilePictureURL(_ url: String) {
     guard let userId = Auth.auth().currentUser?.uid else { return }
-    
+
     let db = Firestore.firestore()
     db.collection("users").document(userId).updateData([
         "profilePictureURL": url
     ]) { error in
         if let error = error {
-            print("Error saving profile picture URL: \(error.localizedDescription)")
+            print("❌ Error saving profile picture URL to Firestore: \(error.localizedDescription)")
         } else {
-            print("Profile picture URL updated successfully.")
+            print("✅ Profile picture URL saved to Firestore successfully!")
         }
     }
 }
+
 
 func fetchProfilePictureURL(completion: @escaping (String?) -> Void) {
     guard let userId = Auth.auth().currentUser?.uid else {
         completion(nil)
         return
     }
-    
+
     let db = Firestore.firestore()
     db.collection("users").document(userId).getDocument { document, error in
         if let error = error {
-            print("Error fetching profile picture URL: \(error.localizedDescription)")
+            print("❌ Error fetching profile picture URL: \(error.localizedDescription)")
             completion(nil)
-        } else if let data = document?.data(), let url = data["profilePictureURL"] as? String {
+            return
+        }
+
+        if let data = document?.data(), let url = data["profilePictureURL"] as? String {
+            print("✅ Profile picture URL fetched: \(url)")
             completion(url)
         } else {
+            print("⚠️ No profile picture URL found in Firestore")
             completion(nil)
+        }
+    }
+}
+
+func checkAdminStatus(completion: @escaping (Bool) -> Void) {
+    guard let userId = Auth.auth().currentUser?.uid else {
+        completion(false)
+        return
+    }
+
+    let db = Firestore.firestore()
+    db.collection("users").document(userId).getDocument { document, error in
+        if let document = document, document.exists {
+            let isAdmin = document.data()?["isAdmin"] as? Bool ?? false
+            completion(isAdmin)
+        } else {
+            completion(false)
         }
     }
 }

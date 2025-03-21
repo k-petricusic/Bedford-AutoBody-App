@@ -134,10 +134,10 @@ struct SignUpScreen: View {
                         .padding(.top, 20)
                 }
                 
-                // NavigationLink for HomeScreen
-                NavigationLink(destination: NaviView(), isActive: $isSignedUp) {
-                    EmptyView()
+                .navigationDestination(isPresented: $isSignedUp) {
+                    NaviView()
                 }
+
             }
             .alert(isPresented: $showAlert) {
                 Alert(title: Text("Alert"), message: Text(alertMessage), dismissButton: .default(Text("OK")))

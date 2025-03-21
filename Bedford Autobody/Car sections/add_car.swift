@@ -6,12 +6,17 @@ struct AddCarView: View {
     @Binding var cars: [Car]
     @State private var make = ""
     @State private var model = ""
+    @State private var submodel = "" // 🔹 Optional submodel field
     @State private var year = ""
-    @State private var vin = "" // VIN input field
-    @State private var color = "" // Color input field
-    @State private var estimatedPickupDate = "" // Estimated Pickup Date input field
-    @State private var showAlert = false // For displaying the alert
-    @Environment(\.presentationMode) var presentationMode // Access the presentation mode
+    @State private var vin = ""
+    @State private var color = ""
+    @State private var estimatedPickupDate = ""
+    
+    @State private var numDoors = 4 // 🔹 Default to 4 doors
+    @State private var carType = "Car" // 🔹 Default to "Car" instead of "None"
+    
+    @State private var showAlert = false
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack {
@@ -27,6 +32,9 @@ struct AddCarView: View {
             TextField("Model", text: $model)
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
+            TextField("Submodel (Optional)", text: $submodel) // 🔹 Optional submodel field
+                .padding()
+                .textFieldStyle(RoundedBorderTextFieldStyle())
             TextField("Year", text: $year)
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
@@ -36,7 +44,33 @@ struct AddCarView: View {
             TextField("Color", text: $color)
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-    
+
+            // 🔹 "Choose your vehicle" label
+            Text("Choose your vehicle")
+                .font(.headline)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+
+            // 🔹 Picker for Car Type
+            Picker("", selection: $carType) {
+                Text("Car").tag("Car") // 🔹 Changed from "None"
+                Text("SUV").tag("SUV")
+                Text("Van").tag("Van")
+                Text("Truck").tag("Truck")
+            }
+            .pickerStyle(MenuPickerStyle())
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+
+            // 🔹 Picker for Number of Doors (Aligned Left)
+            Picker("", selection: $numDoors) {
+                Text("2 Doors").tag(2)
+                Text("4 Doors").tag(4)
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal)
+
             // Save Car Button
             Button(action: {
                 saveCar()
@@ -62,16 +96,16 @@ struct AddCarView: View {
         .alert(isPresented: $showAlert) {
             Alert(
                 title: Text("Validation Error"),
-                message: Text("Please fill in all the fields."),
+                message: Text("Please fill in all the required fields."),
                 dismissButton: .default(Text("OK"))
             )
         }
     }
 
     private func saveCar() {
-        // Check if all fields are filled
+        // Check if all required fields are filled
         if make.isEmpty || model.isEmpty || year.isEmpty || vin.isEmpty || color.isEmpty {
-            showAlert = true // Show alert if fields are empty
+            showAlert = true // Show alert if required fields are empty
             return
         }
 
@@ -81,14 +115,17 @@ struct AddCarView: View {
             return
         }
 
-        // Create a new car with the entered details and optional estimatedPickupDate
+        // Create a new car with the entered details
         let newCar = Car(
             ownerId: user.uid,
             make: make,
             model: model,
+            submodel: submodel, // 🔹 Save submodel
             year: year,
             vin: vin,
             color: color,
+            numDoors: numDoors, // 🔹 Save numDoors
+            carType: carType, // 🔹 Save carType
             estimateTotal: 0.0, // Default estimate total
             estimatedPickupDate: estimatedPickupDate.isEmpty ? nil : estimatedPickupDate
         )

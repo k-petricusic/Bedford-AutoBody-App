@@ -8,21 +8,28 @@
 import SwiftUI
 
 struct ProfileView: View {
+    @ObservedObject var appData: AppDataViewModel
+    
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
                     // Profile Header
-                    ProfileHeaderView()
+                    ProfileHeaderView(appData: appData)
                     
                     // Personal Info
                     PersonalInfoView()
 
                     // Account Settings
-                    AccountSettingsView()
+                    //AccountSettingsView()
 
                     // Help & Support
                     HelpSupportView()
+                    
+                    AccountDeletionSection()
+                    
+                    // Switch to Admin mode
+                    SwitchToAdminView()
 
                     // Logout Button
                     LogoutButtonView()

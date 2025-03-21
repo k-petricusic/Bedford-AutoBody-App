@@ -83,7 +83,8 @@ class Chat: MessagesViewController, MessagesDataSource, MessagesLayoutDelegate, 
             "displayName": (message.sender as? Sender)?.displayName ?? "",
             "messageId": message.messageId,
             "sentDate": message.sentDate,
-            "text": text
+            "text": text,
+            "isRead": false
         ]
         db.collection("messages").addDocument(data: messageData)
     }
@@ -98,26 +99,57 @@ class Chat: MessagesViewController, MessagesDataSource, MessagesLayoutDelegate, 
             .addSnapshotListener { querySnapshot, error in
                 self.activityIndicator.stopAnimating()
                 if let error = error {
-                    print("Error fetching messages: \(error.localizedDescription)")
+                    print("❌ Error fetching messages: \(error.localizedDescription)")
                     return
                 }
+
+                var unreadMessageIds: [String] = []
+
                 self.messages = querySnapshot?.documents.compactMap { document in
                     let data = document.data()
-                    guard
-                        let senderId = data["senderId"] as? String,
-                        let displayName = data["displayName"] as? String,
-                        let messageId = data["messageId"] as? String,
-                        let sentDate = (data["sentDate"] as? Timestamp)?.dateValue(),
-                        let text = data["text"] as? String
-                    else { return nil }
+                    guard let senderId = data["senderId"] as? String,
+                          let displayName = data["displayName"] as? String,
+                          let messageId = data["messageId"] as? String,
+                          let sentDate = (data["sentDate"] as? Timestamp)?.dateValue(),
+                          let text = data["text"] as? String,
+                          let isRead = data["isRead"] as? Bool else { return nil }
+
+                    let docId = document.documentID
+
+                    // ✅ Collect unread messages sent by the admin
+                    if senderId == "admin" && !isRead {
+                        unreadMessageIds.append(docId)
+                    }
+
                     return Message(sender: Sender(senderId: senderId, displayName: displayName), messageId: messageId, sentDate: sentDate, kind: .text(text))
                 } ?? []
+
+                // ✅ Mark all unread messages as read
+                self.markMessagesAsRead(unreadMessageIds)
+
                 DispatchQueue.main.async {
                     self.messagesCollectionView.reloadData()
                     self.messagesCollectionView.scrollToLastItem()
                 }
             }
     }
+
+    private func markMessagesAsRead(_ messageIds: [String]) {
+        guard !messageIds.isEmpty else { return }
+
+        let db = Firestore.firestore()
+
+        for messageId in messageIds {
+            db.collection("messages").document(messageId).updateData(["isRead": true]) { error in
+                if let error = error {
+                    print("❌ Error marking message as read: \(error.localizedDescription)")
+                } else {
+                    print("✅ Message marked as read: \(messageId)")
+                }
+            }
+        }
+    }
+
 
     private func sendNotificationToAdmin(message: String) {
         guard let adminId = adminId, let userId = Auth.auth().currentUser?.uid else {
@@ -187,7 +219,7 @@ class Chat: MessagesViewController, MessagesDataSource, MessagesLayoutDelegate, 
         if indexPath.section == 0 {
             return formatTimestamp(for: message.sentDate)
         }
-        let previousMessage = messages[indexPath.section - 1] as! MessageType
+        let previousMessage = messages[indexPath.section - 1] 
         if message.sentDate.timeIntervalSince(previousMessage.sentDate) > timeIntervalThreshold {
             return formatTimestamp(for: message.sentDate)
         }

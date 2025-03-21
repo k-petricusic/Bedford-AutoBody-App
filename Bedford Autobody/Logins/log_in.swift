@@ -1,18 +1,17 @@
 import SwiftUI
 import FirebaseAuth
 import FirebaseMessaging
-import FirebaseFirestore
 
 struct LogInScreen: View {
     @Environment(\.colorScheme) var colorScheme
     @State private var email = ""
     @State private var password = ""
     @State private var isLoggedIn = false
+    @State private var isAdmin = false // Track admin status
     @State private var showAlert = false
     @State private var alertMessage = ""
-    
-    // Reset credentials on navigation
-    var resetCredentials: Bool  // Flag passed from LoginOptions to reset fields
+
+    var resetCredentials: Bool
 
     var body: some View {
         NavigationStack {
@@ -22,7 +21,7 @@ struct LogInScreen: View {
                     .bold()
                     .foregroundColor(colorScheme == .dark ? .white : .black)
                     .padding(.top, 50)
-                
+
                 // Email Field
                 TextField("Email", text: $email)
                     .padding()
@@ -31,7 +30,7 @@ struct LogInScreen: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .foregroundColor(colorScheme == .dark ? .white : .black)
                     .padding(.top, 20)
-                
+
                 // Password Field
                 SecureField("Password", text: $password)
                     .padding()
@@ -40,24 +39,10 @@ struct LogInScreen: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .foregroundColor(colorScheme == .dark ? .white : .black)
                     .padding(.top, 20)
-                
+
                 // Login Button
                 Button(action: {
-                    // Firebase Login
-                    Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
-                        if let error = error {
-                            DispatchQueue.main.async {
-                                alertMessage = "Login Failed: \(error.localizedDescription)"
-                                showAlert = true
-                            }
-                        } else if let user = authResult?.user {
-                            // Successful Login
-                            DispatchQueue.main.async {
-                                updateFCMToken(for: user) // Update FCM token for the logged-in user
-                                isLoggedIn = true
-                            }
-                        }
-                    }
+                    loginUser()
                 }) {
                     Text("Login")
                         .font(.headline)
@@ -71,41 +56,42 @@ struct LogInScreen: View {
                 .alert(isPresented: $showAlert) {
                     Alert(title: Text("Login Failed"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
                 }
-                
+
                 Spacer()
             }
             .padding()
             .background(colorScheme == .dark ? Color.black : Color.white)
             .cornerRadius(10)
-            
-            // Navigate to HomeScreen if login is successful
-            NavigationLink(destination: NaviView(), isActive: $isLoggedIn) {
-                EmptyView()
+
+            // 🔹 Navigate Based on Role (Admin or Regular User)
+            .navigationDestination(isPresented: $isLoggedIn) {
+                if isAdmin {
+                    AdminRootView()
+                } else {
+                    NaviView()
+                }
             }
         }
         .onAppear {
-            // Reset credentials if the flag is true
             if resetCredentials {
                 email = ""
                 password = ""
             }
         }
     }
-    
-    // Update FCM Token for the logged-in user
-    func updateFCMToken(for firebaseUser: FirebaseAuth.User) {
-        Messaging.messaging().token { token, error in
+
+    private func loginUser() {
+        Auth.auth().signIn(withEmail: email, password: password) { authResult, error in
             if let error = error {
-                print("Error retrieving FCM token: \(error.localizedDescription)")
-            } else if let token = token {
-                let db = Firestore.firestore()
-                db.collection("users").document(firebaseUser.uid).updateData([
-                    "fcmToken": token
-                ]) { error in
-                    if let error = error {
-                        print("Error updating FCM token in Firestore: \(error.localizedDescription)")
-                    } else {
-                        print("FCM token updated successfully for user \(firebaseUser.uid)")
+                DispatchQueue.main.async {
+                    alertMessage = "Login Failed: \(error.localizedDescription)"
+                    showAlert = true
+                }
+            } else if authResult?.user != nil { // ✅ No need to store 'user' if not used
+                checkAdminStatus { isAdmin in
+                    DispatchQueue.main.async {
+                        self.isAdmin = isAdmin
+                        self.isLoggedIn = true
                     }
                 }
             }

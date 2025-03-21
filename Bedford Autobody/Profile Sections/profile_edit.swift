@@ -30,11 +30,11 @@ struct EditProfileView: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding(.horizontal)
 
-                    TextField("Email", text: $email)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding(.horizontal)
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
+                    //TextField("Email", text: $email)
+                      //  .textFieldStyle(RoundedBorderTextFieldStyle())
+                        //.padding(.horizontal)
+                        //.keyboardType(.emailAddress)
+                        //.autocapitalization(.none)
 
                     TextField("Phone Number", text: $phone)
                         .textFieldStyle(RoundedBorderTextFieldStyle())

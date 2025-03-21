@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		234053A12D1F72D90030A442 /* ConfettiSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 234053A02D1F72D90030A442 /* ConfettiSwiftUI */; };
 		239294E92D19ED1500CD3D4C /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 239294E82D19ED1500CD3D4C /* FirebaseMessaging */; };
+		239616C22D7F875400A39DBD /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 239616C12D7F875400A39DBD /* FirebaseFunctions */; };
 		2396A71F2D2865B1000BCDF9 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 2396A71E2D2865B1000BCDF9 /* FirebaseStorage */; };
 		239746F42D2F190200129666 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 239746F32D2F190200129666 /* SDWebImageSwiftUI */; };
 		C00949F32D0BA5C500041A1F /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = C00949F22D0BA5C500041A1F /* FirebaseAnalytics */; };
@@ -19,7 +20,6 @@
 		C00949FE2D0BA64900041A1F /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = C00949FD2D0BA64900041A1F /* KeychainAccess */; };
 		C041203B2D11DDC8006292CF /* MessageKit in Frameworks */ = {isa = PBXBuildFile; productRef = C041203A2D11DDC8006292CF /* MessageKit */; };
 		C041203E2D11E045006292CF /* InputBarAccessoryView in Frameworks */ = {isa = PBXBuildFile; productRef = C041203D2D11E045006292CF /* InputBarAccessoryView */; };
-		C04120402D11E0D3006292CF /* Storyboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C041203F2D11E0D3006292CF /* Storyboard.storyboard */; };
 		C04D47752D0C9BEE00C32737 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = C04D47742D0C9BEE00C32737 /* FirebaseAuth */; };
 		C04D47772D0C9BF700C32737 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = C04D47762D0C9BF700C32737 /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
@@ -42,15 +42,35 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		C041203F2D11E0D3006292CF /* Storyboard.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Storyboard.storyboard; sourceTree = "<group>"; };
 		C04844DD2D0392E100034F07 /* Bedford Autobody.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Bedford Autobody.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04844ED2D0392E200034F07 /* Bedford AutobodyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Bedford AutobodyTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C04844F72D0392E200034F07 /* Bedford AutobodyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Bedford AutobodyUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		23A139252D809BAB00F008DD /* Exceptions for "Bedford Autobody" folder in "Bedford AutobodyTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"GoogleService-Info.plist",
+			);
+			target = C04844EC2D0392E200034F07 /* Bedford AutobodyTests */;
+		};
+		23A139262D809BAB00F008DD /* Exceptions for "Bedford Autobody" folder in "Bedford AutobodyUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"GoogleService-Info.plist",
+			);
+			target = C04844F62D0392E200034F07 /* Bedford AutobodyUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C04844DF2D0392E100034F07 /* Bedford Autobody */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				23A139252D809BAB00F008DD /* Exceptions for "Bedford Autobody" folder in "Bedford AutobodyTests" target */,
+				23A139262D809BAB00F008DD /* Exceptions for "Bedford Autobody" folder in "Bedford AutobodyUITests" target */,
+			);
 			path = "Bedford Autobody";
 			sourceTree = "<group>";
 		};
@@ -83,6 +103,7 @@
 				2396A71F2D2865B1000BCDF9 /* FirebaseStorage in Frameworks */,
 				C04D47772D0C9BF700C32737 /* FirebaseFirestore in Frameworks */,
 				C04D47752D0C9BEE00C32737 /* FirebaseAuth in Frameworks */,
+				239616C22D7F875400A39DBD /* FirebaseFunctions in Frameworks */,
 				239294E92D19ED1500CD3D4C /* FirebaseMessaging in Frameworks */,
 				C00949F52D0BA5C500041A1F /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
 			);
@@ -108,7 +129,6 @@
 		C04844D42D0392E100034F07 = {
 			isa = PBXGroup;
 			children = (
-				C041203F2D11E0D3006292CF /* Storyboard.storyboard */,
 				C04844DF2D0392E100034F07 /* Bedford Autobody */,
 				C04844F02D0392E200034F07 /* Bedford AutobodyTests */,
 				C04844FA2D0392E200034F07 /* Bedford AutobodyUITests */,
@@ -259,7 +279,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C04120402D11E0D3006292CF /* Storyboard.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -488,6 +507,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "Bedford Autobody/Bedford Autobody.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -495,6 +515,7 @@
 				DEVELOPMENT_TEAM = YJZG87QGT5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -504,7 +525,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "APP.Bedford-Autobody";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -518,6 +539,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "Bedford Autobody/Bedford Autobody.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -525,6 +547,7 @@
 				DEVELOPMENT_TEAM = YJZG87QGT5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -534,7 +557,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "APP.Bedford-Autobody";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -725,6 +748,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C00949F12D0BA5C500041A1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseMessaging;
+		};
+		239616C12D7F875400A39DBD /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C00949F12D0BA5C500041A1F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
 		};
 		2396A71E2D2865B1000BCDF9 /* FirebaseStorage */ = {
 			isa = XCSwiftPackageProductDependency;

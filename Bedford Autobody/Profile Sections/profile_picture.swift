@@ -1,10 +1,9 @@
 import SwiftUI
 import PhotosUI
-import FirebaseStorage
 
 struct ProfileHeaderView: View {
+    @ObservedObject var appData: AppDataViewModel // ✅ Uses preloaded data
     @State private var profileImage: UIImage? = nil
-    @State private var profileImageURL: String? = nil
     @State private var showImagePicker = false
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var isUploading = false
@@ -20,22 +19,22 @@ struct ProfileHeaderView: View {
                 } else if let profileImage = profileImage {
                     Image(uiImage: profileImage)
                         .resizable()
-                        .scaledToFit()
+                        .scaledToFill()
                         .frame(width: 100, height: 100)
                         .clipShape(Circle())
                         .background(Circle().fill(Color(.systemGray6)))
                         .overlay(Circle().stroke(Color.white, lineWidth: 2))
-                } else if let profileImageURL = profileImageURL, let url = URL(string: profileImageURL) {
+                } else if let urlString = appData.profilePictureURL, let url = URL(string: urlString) {
                     AsyncImage(url: url) { phase in
                         switch phase {
                         case .success(let image):
-                            image.resizable()
+                            image.resizable().scaledToFill()
+                        case .failure(_):
+                            Image(systemName: "person.crop.circle.fill").resizable()
                         default:
-                            Image(systemName: "person.crop.circle.fill")
-                                .resizable()
+                            ProgressView() // ✅ Placeholder while loading
                         }
                     }
-                    .scaledToFit()
                     .frame(width: 100, height: 100)
                     .clipShape(Circle())
                     .background(Circle().fill(Color(.systemGray6)))
@@ -43,7 +42,7 @@ struct ProfileHeaderView: View {
                 } else {
                     Image(systemName: "person.crop.circle.fill")
                         .resizable()
-                        .scaledToFit()
+                        .scaledToFill()
                         .frame(width: 100, height: 100)
                         .clipShape(Circle())
                         .background(Circle().fill(Color(.systemGray6)))
@@ -63,19 +62,13 @@ struct ProfileHeaderView: View {
                 .offset(x: 35, y: 35)
             }
         }
-        .onAppear {
-            fetchProfilePictureURL { url in
-                DispatchQueue.main.async {
-                    self.profileImageURL = url
-                }
-            }
-        }
         .photosPicker(isPresented: $showImagePicker, selection: $selectedItem, matching: .images)
-        .onChange(of: selectedItem) { newItem in
-            if let newItem = newItem {
+        .onChange(of: selectedItem) {
+            if let newItem = selectedItem {
                 loadSelectedImage(from: newItem)
             }
         }
+
     }
 
     private func loadSelectedImage(from item: PhotosPickerItem) {
@@ -88,7 +81,8 @@ struct ProfileHeaderView: View {
                         self.profileImage = uiImage
                         uploadProfilePicture(image: uiImage) { url in
                             DispatchQueue.main.async {
-                                self.profileImageURL = url
+                                self.profileImage = nil // ✅ Clear local image so AsyncImage reloads
+                                appData.profilePictureURL = url // ✅ Update global profile picture URL
                                 self.isUploading = false
                             }
                         }
@@ -96,7 +90,7 @@ struct ProfileHeaderView: View {
                         self.isUploading = false
                     }
                 case .failure(let error):
-                    print("Error loading image: \(error.localizedDescription)")
+                    print("❌ Error loading image: \(error.localizedDescription)")
                     self.isUploading = false
                 }
             }
